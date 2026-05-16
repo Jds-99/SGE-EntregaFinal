@@ -1,0 +1,11 @@
+C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Dominio\obj\Debug\net10.0\SGE.Dominio.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Dominio\obj\Debug\net10.0\SGE.Dominio.AssemblyInfoInputs.cache
+C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Dominio\obj\Debug\net10.0\SGE.Dominio.AssemblyInfo.cs
+C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Dominio\obj\Debug\net10.0\SGE.Dominio.csproj.CoreCompileInputs.cache
+C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Dominio\bin\Debug\net10.0\SGE.Dominio.deps.json
+C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Dominio\bin\Debug\net10.0\SGE.Dominio.dll
+C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Dominio\bin\Debug\net10.0\SGE.Dominio.pdb
+C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Dominio\obj\Debug\net10.0\SGE.Dominio.dll
+C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Dominio\obj\Debug\net10.0\refint\SGE.Dominio.dll
+C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Dominio\obj\Debug\net10.0\SGE.Dominio.pdb
+C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Dominio\obj\Debug\net10.0\ref\SGE.Dominio.dll
