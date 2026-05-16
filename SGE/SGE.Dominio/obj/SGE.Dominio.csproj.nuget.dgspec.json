@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\estudiante\\OneDrive\\Desktop\\ProyectoFinalNet\\SGE\\SGE.Dominio\\SGE.Dominio.csproj": {}
+    "C:\\Seminario-.Net\\SGE\\SGE.Dominio\\SGE.Dominio.csproj": {}
   },
   "projects": {
-    "C:\\Users\\estudiante\\OneDrive\\Desktop\\ProyectoFinalNet\\SGE\\SGE.Dominio\\SGE.Dominio.csproj": {
+    "C:\\Seminario-.Net\\SGE\\SGE.Dominio\\SGE.Dominio.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\estudiante\\OneDrive\\Desktop\\ProyectoFinalNet\\SGE\\SGE.Dominio\\SGE.Dominio.csproj",
+        "projectUniqueName": "C:\\Seminario-.Net\\SGE\\SGE.Dominio\\SGE.Dominio.csproj",
         "projectName": "SGE.Dominio",
-        "projectPath": "C:\\Users\\estudiante\\OneDrive\\Desktop\\ProyectoFinalNet\\SGE\\SGE.Dominio\\SGE.Dominio.csproj",
-        "packagesPath": "C:\\Users\\estudiante\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\estudiante\\OneDrive\\Desktop\\ProyectoFinalNet\\SGE\\SGE.Dominio\\obj\\",
+        "projectPath": "C:\\Seminario-.Net\\SGE\\SGE.Dominio\\SGE.Dominio.csproj",
+        "packagesPath": "C:\\Users\\Jorge\\.nuget\\packages\\",
+        "outputPath": "C:\\Seminario-.Net\\SGE\\SGE.Dominio\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\estudiante\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Jorge\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
