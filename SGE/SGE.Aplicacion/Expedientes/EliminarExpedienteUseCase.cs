@@ -1,20 +1,17 @@
 using SGE.Dominio;
 using SGE.Aplicacion;
 
-public class EliminarTramiteUseCase(ITramiteRepository tramiteRepo, ActualizacionEstadoExpedienteService estadoService, 
-    IAutorizacionService autorizacion)
+public class EliminarExpedienteUseCase(IExpedienteRepository expedienteRepo, IAutorizacionService autorizacion)
 {
-    public EliminarTramiteResponse Ejecutar(EliminarTramiteRequest request)
+    public EliminarExpedienteResponse Ejecutar(EliminarExpedienteRequest request)
     {
-        if (!autorizacion.PoseeElPermiso(Permiso.TramiteBaja, request.UsuarioId))
-            throw new AutorizacionException("No tenés permisos para eliminar trámites.");
-        var tramite = tramiteRepo.ObtenerPorId(request.IdTramite)
-            ?? throw new ValidacionException($"El trámite con ID {request.IdTramite} no existe.");
-        int expedienteIdAsociado = tramite.ExpedienteId;
-        tramiteRepo.Eliminar(request.IdTramite);
+        if (!autorizacion.PoseeElPermiso(Permiso.ExpedienteBaja, request.UsuarioId))
+            throw new AutorizacionException("No tenés permisos para eliminar expedientes.");
 
-        estadoService.ActualizarEstado(expedienteIdAsociado);
+        var expediente = expedienteRepo.ObtenerPorId(request.IdExpediente)
+            ?? throw new ValidacionException($"El expediente con ID {request.IdExpediente} no existe.");
 
-        return new EliminarTramiteResponse(Exito: true, IdTramiteEliminado: request.IdTramite);
+        expedienteRepo.Eliminar(request.IdExpediente);
+        return new EliminarExpedienteResponse(Exito: true, IdExpedienteEliminado: request.IdExpediente);
     }
 }
