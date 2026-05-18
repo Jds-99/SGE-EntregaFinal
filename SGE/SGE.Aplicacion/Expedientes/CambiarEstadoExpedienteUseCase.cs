@@ -5,10 +5,8 @@ namespace SGE.Aplicacion;
 
 public class CambiarEstadoExpedienteUseCase
 {
-    public CambiarEstadoExpedienteResponse Ejecutar(CambiarEstadoExpedienteRequest request)
-    {
-        var estadoNuevo= request.estado;
-
+    public CambiarEstadoExpedienteResponse Ejecutar(CambiarEstadoExpedienteRequest request){
+        var estadoNuevo = request.estado;
         return new CambiarEstadoExpedienteResponse(estadoNuevo);
     }
 }
