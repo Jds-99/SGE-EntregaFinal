@@ -6,8 +6,7 @@ namespace SGE.Aplicacion;
 public interface ITramiteRepository
 {
     void  Agregar(Tramite tramite);
-    Tramite?  ObtenerPorId(Guid id);
-    void Modificar(Guid id);
+    void Modificar(Tramite tramite);
     void Eliminar(Guid id);
-    Tramite? ObetenerPorExedienteId(Guid id); // preguntar que tiene que retornar
+    IEnumerable<Tramite> ObtenerPorExpedienteId(Guid id);
 }

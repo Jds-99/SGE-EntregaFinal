@@ -22,8 +22,8 @@ public class TramiteTxtRepository : ITramiteRepository{
             var fechaCreacion = DateTime.Parse(sr.ReadLine() ?? "");
             var fechaUltimaModificacion = DateTime.Parse(sr.ReadLine() ?? "");
             var usuarioUltimoCambio = Guid.Parse(sr.ReadLine() ?? "");
-            var contenidoVO = new ContenidoTramite(contenido);
-            var tramite = Tramite.Reconstruir(id, idExpediente, etiqueta, contenidoVO, fechaCreacion, fechaUltimaModificacion, usuarioUltimoCambio);
+            var contenidoVO = new Contenido(contenido);
+            var tramite = Tramite.FactoryMethodTramite(id, idExpediente, usuarioUltimoCambio,contenidoVO,fechaCreacion,fechaUltimaModificacion,etiqueta);
             lista.Add(tramite);
         }
         return lista; 
@@ -36,7 +36,7 @@ public class TramiteTxtRepository : ITramiteRepository{
         writer.WriteLine(tramite.contenido); 
         writer.WriteLine(tramite.FechaCreacion.ToString()); // Formato "o" (round-trip) evita problemas de fechas
         writer.WriteLine(tramite.FechaUltimaModificacion.ToString());
-        writer.WriteLine(tramite.UsuarioUltimoCambio);
+        writer.WriteLine(tramite.UsuarioUlimoCambio);
     }
 
     private void GuardarTodoElArchivo(List<Tramite> listaTramites){
@@ -70,5 +70,47 @@ public class TramiteTxtRepository : ITramiteRepository{
             throw new RepositorioException($"No se encontró el trámite con ID {id} para eliminar.");
         }
         GuardarTodoElArchivo(listaFiltrada);
+    }
+    public IEnumerable<Tramite> ObtenerPorExpedienteId(Guid idExpediente)
+    {
+        var listaFiltrada = new List<Tramite>();
+        if (!File.Exists(_nombreArchivo))
+        {
+            return listaFiltrada; // Si no existe, devolvemos la lista vacía 
+        }
+        using (var sr = new StreamReader(_nombreArchivo))
+        {
+            string? linea;
+            // Leemos línea por línea hasta el final del archivo
+            while ((linea = sr.ReadLine()) != null)
+            {
+                string[] campos = linea.Split(';');
+                // Parseamos el ExpedienteId de la línea para ver si coincide con el buscado
+                Guid tramiteExpedienteId = Guid.Parse(campos[1]);
+                if (tramiteExpedienteId == idExpediente)
+                {
+                    // Si coincide, extraemos todos los datos de la línea
+                    Guid id = Guid.Parse(campos[0]);
+                    EtiquetaTramite etiqueta = Enum.Parse<EtiquetaTramite>(campos[2]);
+                    var contenidoVo = new Contenido(campos[3]); // Objeto de Valor
+                    DateTime fechaCreacion = DateTime.Parse(campos[4]);
+                    DateTime fechaModificacion = DateTime.Parse(campos[5]);
+                    Guid usuarioUltimoCambio = Guid.Parse(campos[6]);
+
+                    // Usamos factory method para reconstruir el tramite
+                    Tramite tramiteReconstruido = Tramite.FactoryMethodTramite(
+                        id,                   
+                        tramiteExpedienteId,  
+                        usuarioUltimoCambio,   
+                        contenidoVo,          
+                        fechaCreacion,         
+                        fechaModificacion,    
+                        etiqueta               
+                        );
+                listaFiltrada.Add(tramiteReconstruido);
+            }
+            }
+        }
+        return listaFiltrada;
     }
 }
