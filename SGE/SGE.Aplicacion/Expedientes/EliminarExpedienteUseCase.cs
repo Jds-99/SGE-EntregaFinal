@@ -9,7 +9,7 @@ public class EliminarExpedienteUseCase(IExpedienteRepository expedienteRepo, IAu
             throw new AutorizacionException("No tenés permisos para eliminar expedientes.");
 
         var expediente = expedienteRepo.ObtenerPorId(request.IdExpediente)
-            ?? throw new ValidacionException($"El expediente con ID {request.IdExpediente} no existe.");
+            ?? throw new EntidadNoEncontradaException($"El expediente con ID {request.IdExpediente} no existe.");
 
         expedienteRepo.Eliminar(request.IdExpediente);
         return new EliminarExpedienteResponse(Exito: true, IdExpedienteEliminado: request.IdExpediente);

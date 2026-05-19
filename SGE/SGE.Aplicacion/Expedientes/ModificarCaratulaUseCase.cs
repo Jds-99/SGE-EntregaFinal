@@ -24,7 +24,7 @@ public class ModificarCaratulaUseCase
         }
 
         Expediente expediente = this.RepositorioExpedientes.ObtenerPorId(request.ExpedienteId) 
-            ?? throw new ValidacionException($"No se encontró el expediente con ID {request.ExpedienteId}");
+            ?? throw new EntidadNoEncontradaException($"No se encontró el expediente con ID {request.ExpedienteId}");
 
         var nuevaCaratula = new CaratulaExpediente(request.NuevaCaratulaTexto);
         expediente.CambiarCaratula(nuevaCaratula, request.UsuarioId);
