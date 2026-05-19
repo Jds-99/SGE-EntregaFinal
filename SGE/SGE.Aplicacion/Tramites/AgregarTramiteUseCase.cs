@@ -14,14 +14,14 @@ public class AgregarTramiteUseCase(
             throw new AutorizacionException("El usuario no tiene permisos para dar de alta trámites.");
 
         if (string.IsNullOrWhiteSpace(request.Detalle))
-            throw new ValidacionException("El detalle del trámite no puede estar vacío.");
+            throw new EntidadNoEncontradaException("El detalle del trámite no puede estar vacío.");
 
         var expediente = expedienteRepo.ObtenerPorId(request.ExpedienteId)
-            ?? throw new ValidacionException($"No existe el expediente con ID {request.ExpedienteId}");
+            ?? throw new EntidadNoEncontradaException($"No existe el expediente con ID {request.ExpedienteId}");
 
         //Parsear la etiqueta string recibida al Enum correspondiente del Dominio
         if (!Enum.TryParse<EtiquetaTramite>(request.Etiqueta, true, out var etiquetaEnum))
-            throw new ValidacionException($"La etiqueta '{request.Etiqueta}' no es válida.");
+            throw new EntidadNoEncontradaException($"La etiqueta '{request.Etiqueta}' no es válida.");
 
         var nuevoTramite = new Tramite(request.ExpedienteId, request.Detalle, etiquetaEnum);
         tramiteRepo.Agregar(nuevoTramite);

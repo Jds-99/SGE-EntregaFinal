@@ -1,29 +1,31 @@
-﻿using SGE.Aplicacion;
+﻿namespace SGE.Consola;
+using SGE.Aplicacion;
 using SGE.Dominio;
 using SGE.Infraestructura;
+using SGE.Infraestructura.Tramites;
 
 public class Program {
     static void Main(String[] arg)
     {
         // instanciamos repositorios
-        var tramiteRepository= new TramiteTxtRepository();
-        var expedienteRepository= new ExpeditenteTxtRepository();
-       
+        ITramiteRepository repositoryTramite = new TramiteTxtRepository();
+        IExpedienteRepository repositoryExpediente = new ExpedienteTxtRepository();
+        
         // servicio de aprobacio provisional y cambio automatico de estado
 
         var autorizacion= new AutorizacionProvisionalService();
 
         // inyectar casos de usos a sus dto de Expediente
         var GuidUsuario=Guid.NewGuid();
-        var altaExpedienteUseCase= new AgregarExpedienteUseCase(expedienteRepository,autorizacion);
-        var bajaExpedienteUseCase = new EliminarExpedienteUseCase(expedienteRepository, autorizacion);
-        var modificarCaratulaExpedienteUseCase= new ModificarCaratulaUseCase(expedienteRepository,autorizacion);
-        var cambiarEstadoManualUseCase= new CambiarEstadoExpedienteUseCase(expedienteRepository,autorizacion);
-        var obtenerPorIdUseCase=new ObtenerPorIdUseCase(expedienteRepository,autorizacion);
+        var altaExpedienteUseCase= new AgregarExpedienteUseCase(repositoryExpediente,autorizacion);
+        var bajaExpedienteUseCase = new EliminarExpedienteUseCase(repositoryExpediente, autorizacion);
+        var modificarCaratulaExpedienteUseCase= new ModificarCaratulaUseCase(repositoryExpediente,autorizacion);
+        var cambiarEstadoManualUseCase= new CambiarEstadoExpedienteUseCase(repositoryExpediente,autorizacion);
+        var obtenerPorIdUseCase=new ObtenerPorIdUseCase(repositoryExpediente,autorizacion);
         // inyectar casos de uso a dtos de tramite
 
-        var agregarTramiteUseCase= new AgregarTramiteUseCase(tramiteRepository,autorizacion);
-        var listarPorExpedienteIdCaseUse= new ListarPorExpedienteIdCaseUse(tramiteRepository,autorizacion);
+        var agregarTramiteUseCase= new AgregarTramiteUseCase(repositoryTramite,autorizacion);
+        var listarPorExpedienteIdCaseUse= new ListarPorExpedienteIdCaseUse(repositoryTramite,autorizacion);
 
         // id identificador del usuario fijo para la simulacion
 

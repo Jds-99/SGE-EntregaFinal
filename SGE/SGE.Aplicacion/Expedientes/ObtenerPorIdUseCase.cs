@@ -11,7 +11,7 @@ public class ObtenerPorIdUseCase(IExpedienteRepository repositorio, IAutorizacio
         var expediente = repositorio.ObtenerPorId(request.IdExpediente);
         if (expediente == null)
         {
-            throw new Exception($"El expediente con ID {request.IdExpediente} no existe.");
+            throw new EntidadNoEncontradaException($"El expediente con ID {request.IdExpediente} no existe.");
         }
 
         //Mapear la lista de entidades de dominio 'Tramite' a 'TramiteDTO'

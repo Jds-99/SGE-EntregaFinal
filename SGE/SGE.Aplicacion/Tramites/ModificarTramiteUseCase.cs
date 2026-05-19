@@ -12,13 +12,13 @@ public class ModificarTramiteUseCase(
         if (!autorizacion.PoseeElPermiso(Permiso.TramiteModificacion, request.UsuarioId))
             throw new AutorizacionException("El usuario no tiene permisos.");
         var tramite = tramiteRepo.ObtenerPorId(request.IdTramite)
-            ?? throw new ValidacionException($"El trámite con ID {request.IdTramite} no existe.");
+            ?? throw new EntidadNoEncontradaException($"El trámite con ID {request.IdTramite} no existe.");
 
         if (string.IsNullOrWhiteSpace(request.NuevoDetalle))
-            throw new ValidacionException("El detalle modificado no puede estar vacío.");
+            throw new EntidadNoEncontradaException("El detalle modificado no puede estar vacío.");
 
         if (!Enum.TryParse<EtiquetaTramite>(request.NuevaEtiqueta, true, out var nuevaEtiquetaEnum))
-            throw new ValidacionException($"La etiqueta '{request.NuevaEtiqueta}' no es válida.");
+            throw new EntidadNoEncontradaException($"La etiqueta '{request.NuevaEtiqueta}' no es válida.");
 
         tramite.Detalle = request.NuevoDetalle;
         tramite.Etiqueta = nuevaEtiquetaEnum;
