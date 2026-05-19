@@ -3,4 +3,4 @@ using SGE.Dominio.Expedientes;
 
 namespace SGE.Aplicacion.Expedientes;
 
-public record EliminarExpedienteResponse(bool Exito, int IdExpedienteEliminado);
+public record EliminarExpedienteResponse(bool Exito, string IdExpedienteEliminado);

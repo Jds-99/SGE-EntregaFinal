@@ -1,4 +1,4 @@
-using SGE.Aplicacion.Autorizacion;
+using SGE.Infraestructura;
 
 namespace SGE.Infraestructura;
 
