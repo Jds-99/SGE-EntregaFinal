@@ -5,55 +5,89 @@ namespace SGE.Dominio.Tramites;
 
 public class Tramite 
 {
-    public Guid Id {get; private set;}
-    public Guid IdExpediente {get; private set;}
-    public EtiquetaTramite Etiqueta {get; private set;}
-    public Contenido contenido {get; private set;}
-    public DateTime FechaCreacion {get; private set;}
-    public DateTime FechaUltimaModificacion {get; private set;}
-    public Guid UsuarioUlimoCambio {get; private set;}
+    public Guid Id { get; private set; }
+    public Guid IdExpediente { get; private set; }
+    public EtiquetaTramite Etiqueta { get; private set; }
+    public Contenido contenido { get; private set; } 
+    public DateTime FechaCreacion { get; private set; }
+    public DateTime FechaUltimaModificacion { get; private set; }
+    public Guid UsuarioUlimoCambio { get; private set; }
 
     public Tramite(Guid idExpediente, Guid UsuarioUltimoCambio, Contenido contenido)
     {
         this.Id = Guid.NewGuid();
         if (Id == Guid.Empty)
         {
-            throw new DominioExcepcion(" el id del tramite no puede estar vacio");
+            throw new DominioExcepcion("el id del tramite no puede estar vacio");
         }
-        if(idExpediente== Guid.Empty)
+        if (idExpediente == Guid.Empty)
         {
             throw new DominioExcepcion("el id del expdiente no puede ser nulo");
         }
-        this.contenido=contenido;
-        this.UsuarioUlimoCambio=UsuarioUlimoCambio;
-        this.FechaCreacion=DateTime.Now;
-        this.FechaUltimaModificacion=DateTime.Now;
-        this.Etiqueta=EtiquetaTramite.EscritoPresentado;//hola me presento
+        if (UsuarioUltimoCambio == Guid.Empty)
+        {
+            throw new DominioExcepcion("El usuario no puede estar vacio");
+        }
+        
+        if (contenido == null)
+        {
+            throw new DominioExcepcion("El contenido del trámite no puede ser nulo.");
+        }
+
+        this.contenido = contenido;
+        this.IdExpediente = idExpediente; 
+        this.UsuarioUlimoCambio = UsuarioUltimoCambio;
+        this.FechaCreacion = DateTime.Now;
+        this.FechaUltimaModificacion = DateTime.Now;
+        this.Etiqueta = EtiquetaTramite.EscritoPresentado;
     }
-    private Tramite(Guid id,Guid idExpediente,Guid UsuarioUltimoCambio, Contenido contenido, DateTime FechaCreacion, DateTime FechaUltimaModificacion, EtiquetaTramite etiqueta)
+
+    private Tramite(Guid id, Guid idExpediente, Guid UsuarioUltimoCambio, Contenido contenido, DateTime FechaCreacion, DateTime FechaUltimaModificacion, EtiquetaTramite etiqueta)
     {
-        this.Id=id;
-        this.IdExpediente=idExpediente;
-        this.UsuarioUlimoCambio=UsuarioUlimoCambio;
-        this.Etiqueta=etiqueta;
-        this.contenido=contenido;
-        this.FechaCreacion=FechaCreacion;
-        this.FechaUltimaModificacion=FechaUltimaModificacion;
+        this.Id = id;
+        this.IdExpediente = idExpediente;
+        this.UsuarioUlimoCambio = UsuarioUltimoCambio;
+        this.Etiqueta = etiqueta;
+        this.contenido = contenido;
+        this.FechaCreacion = FechaCreacion;
+        this.FechaUltimaModificacion = FechaUltimaModificacion;
     }
         
-    public static Tramite FactoryMethodTramite(Guid id,Guid idExpediente,Guid UsuarioUltimoCambio, Contenido contenido, DateTime FechaCreacion, DateTime FechaUltimaModificacion, EtiquetaTramite etiqueta)
+    public static Tramite FactoryMethodTramite(Guid id, Guid idExpediente, Guid UsuarioUltimoCambio, Contenido contenido, DateTime FechaCreacion, DateTime FechaUltimaModificacion, EtiquetaTramite etiqueta)
     {
-        if( id == Guid.Empty)
+        if (id == Guid.Empty)
             throw new DominioExcepcion("El ID no puede estar vacio");
-        if (idExpediente==Guid.Empty)
+        if (idExpediente == Guid.Empty)
             throw new DominioExcepcion("El ID del expediente no puede estar vacio");
-        if (UsuarioUltimoCambio==Guid.Empty)
+        if (UsuarioUltimoCambio == Guid.Empty)
             throw new DominioExcepcion("El usuario no puede estar vacio");
-        if (FechaCreacion>FechaUltimaModificacion)
+        if (FechaCreacion > FechaUltimaModificacion)
             throw new DominioExcepcion("La fecha de creacion es mayor a la del ultimo cambio");
-        return new Tramite(id,idExpediente,UsuarioUltimoCambio,contenido,FechaCreacion,FechaUltimaModificacion,etiqueta);    
-    }
+        if (contenido == null)
+            throw new DominioExcepcion("El contenido no puede ser nulo");
+
+        return new Tramite(id, idExpediente, UsuarioUltimoCambio, contenido, FechaCreacion, FechaUltimaModificacion, etiqueta);    
     }
 
-   
+    // =========================================================================
+    // NUEVO MÉTODO DE DOMINIO: DELEGACIÓN DE MODIFICACIÓN
+    // =========================================================================
+    public void Modificar(Contenido nuevoContenido, EtiquetaTramite nuevaEtiqueta, Guid usuarioModificador)
+    {
+        if (usuarioModificador == Guid.Empty)
+        {
+            throw new DominioExcepcion("El usuario que realiza la modificación no puede estar vacío.");
+        }
 
+        if (nuevoContenido == null)
+        {
+            throw new DominioExcepcion("El nuevo contenido del trámite no puede ser nulo.");
+        }
+
+        // El estado se modifica internamente protegiendo las reglas de negocio
+        this.contenido = nuevoContenido;
+        this.Etiqueta = nuevaEtiqueta;
+        this.UsuarioUlimoCambio = usuarioModificador;
+        this.FechaUltimaModificacion = DateTime.Now;
+    }
+}
