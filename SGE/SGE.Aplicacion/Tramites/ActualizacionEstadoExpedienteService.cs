@@ -1,13 +1,11 @@
-using SGE.Aplicacion; 
-using SGE.Dominio.Expedientes;   
-
 namespace SGE.Aplicacion.Expedientes;
+using SGE.Aplicacion; 
 
 public class ActualizacionEstadoExpedienteService
 {
-    private readonly IExpedienteRepositorio _repositorio;
+    private readonly IExpedienteRepository _repositorio;
 
-    public ActualizacionEstadoExpedienteService(IExpedienteRepositorio repositorio)
+    public ActualizacionEstadoExpedienteService(IExpedienteRepository repositorio)
     {
         _repositorio = repositorio;
     }
@@ -25,8 +23,5 @@ public class ActualizacionEstadoExpedienteService
         _repositorio.Actualizar(expediente);
         return new ActualizacionEstadoExpedienteResponse("Estado actualizado con éxito");
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 908c6e86bbfadb1d1fdf97c8601d47dfc7b41981
+

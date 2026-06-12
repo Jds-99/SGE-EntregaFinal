@@ -13,3 +13,12 @@ C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Aplicacion\obj\Deb
 C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Aplicacion\obj\Debug\net10.0\refint\SGE.Aplicacion.dll
 C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Aplicacion\obj\Debug\net10.0\SGE.Aplicacion.pdb
 C:\Users\estudiante\OneDrive\Desktop\ProyectoFinalNet\SGE\SGE.Aplicacion\obj\Debug\net10.0\ref\SGE.Aplicacion.dll
+C:\Seminario-.Net\SGE\SGE.Aplicacion\obj\Debug\net10.0\SGE.Aplicacion.csproj.AssemblyReference.cache
+C:\Seminario-.Net\SGE\SGE.Aplicacion\obj\Debug\net10.0\SGE.Aplicacion.GeneratedMSBuildEditorConfig.editorconfig
+C:\Seminario-.Net\SGE\SGE.Aplicacion\obj\Debug\net10.0\SGE.Aplicacion.AssemblyInfoInputs.cache
+C:\Seminario-.Net\SGE\SGE.Aplicacion\obj\Debug\net10.0\SGE.Aplicacion.AssemblyInfo.cs
+C:\Seminario-.Net\SGE\SGE.Aplicacion\obj\Debug\net10.0\SGE.Aplicacion.csproj.CoreCompileInputs.cache
+C:\Seminario-.Net\SGE\SGE.Aplicacion\obj\Debug\net10.0\SGE.Aplicacion.sourcelink.json
+C:\Seminario-.Net\SGE\SGE.Aplicacion\obj\Debug\net10.0\SGE.Aplicacion.dll
+C:\Seminario-.Net\SGE\SGE.Aplicacion\obj\Debug\net10.0\refint\SGE.Aplicacion.dll
+C:\Seminario-.Net\SGE\SGE.Aplicacion\obj\Debug\net10.0\SGE.Aplicacion.pdb

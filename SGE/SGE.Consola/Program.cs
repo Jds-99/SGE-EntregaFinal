@@ -1,79 +1,74 @@
 ﻿namespace SGE.Consola;
-using SGE.Aplicacion;
-using SGE.Dominio;
-using SGE.Infraestructura;
-using SGE.Infraestructura.Tramites;
 
-public class Program {
-    static void Main(String[] arg)
+using SGE.Aplicacion.Tramites;
+using SGE.Aplicacion.Expedientes;
+using SGE.Aplicacion.Autorizacion;
+using SGE.Dominio.Tramites;
+using SGE.Dominio.Expedientes;
+using SGE.Infraestructura.Persistencia; 
+using SGE.Infraestructura.Autorizacion;
+using System;
+
+public class Program 
+{
+    static void Main(string[] args)
     {
-        // instanciamos repositorios
-        ITramiteRepository repositoryTramite = new TramiteTxtRepository();
-        IExpedienteRepository repositoryExpediente = new ExpedienteTxtRepository();
-        
-        // servicio de aprobacio provisional y cambio automatico de estado
+        // 1. Inicialización de Repositorios y Servicios
+        ITramiteRepository repoTramite = new TramiteTxtRepository();
+        IExpedienteRepository repoExpediente = new ExpedienteTxtRepository();
+        var autorizacion = new AutorizacionProvisionalService();
+        var coordinador = new ActualizacionEstadoExpedienteService(repoExpediente, repoTramite);
 
-        var autorizacion= new AutorizacionProvisionalService();
+        // 2. Casos de Uso
+        var altaExpediente = new AgregarExpedienteUseCase(repoExpediente, autorizacion);
+        var altaTramite = new AgregarTramiteUseCase(repoTramite, autorizacion, coordinador);
+        var listarExpedientes = new ListarExpedientesUseCase(repoExpediente, autorizacion);
 
-        // inyectar casos de usos a sus dto de Expediente
-        var GuidUsuario=Guid.NewGuid();
-        var altaExpedienteUseCase= new AgregarExpedienteUseCase(repositoryExpediente,autorizacion);
-        var bajaExpedienteUseCase = new EliminarExpedienteUseCase(repositoryExpediente, autorizacion);
-        var modificarCaratulaExpedienteUseCase= new ModificarCaratulaUseCase(repositoryExpediente,autorizacion);
-        var cambiarEstadoManualUseCase= new CambiarEstadoExpedienteUseCase(repositoryExpediente,autorizacion);
-        var obtenerPorIdUseCase=new ObtenerPorIdUseCase(repositoryExpediente,autorizacion);
-        // inyectar casos de uso a dtos de tramite
+        Guid operadorId = Guid.NewGuid();
 
-        var agregarTramiteUseCase= new AgregarTramiteUseCase(repositoryTramite,autorizacion);
-        var listarPorExpedienteIdCaseUse= new ListarPorExpedienteIdCaseUse(repositoryTramite,autorizacion);
+        Console.WriteLine("=== SIMULACIÓN DE PRUEBAS SGE (FASE 1) ===\n");
 
-        // id identificador del usuario fijo para la simulacion
+        // ------------------------------------------------------------
+        // FLUJO 1: CAMINO FELIZ (Alta y Evolución del Estado)
+        // ------------------------------------------------------------
+        try
+        {
+            Console.WriteLine("[CAMINO FELIZ]");
+            
+            // Creación
+            var res = altaExpediente.Ejecutar(new AgregarExpedienteRequest("Expediente de Prueba", operadorId));
+            Guid expId = res.Id;
+            Console.WriteLine($"1. Expediente creado. ID: {expId.ToString().Substring(0,8)}... | Estado: RecienIniciado");
 
-        Guid idUsuarioOperador=Guid.NewGuid();
+            // Agregar Trámite 1 -> Muta a ParaResolver
+            altaTramite.Ejecutar(new AgregarTramiteRequest(expId, operadorId, "Informe Técnico (PaseAEstudio)"));
+            var exp = repoExpediente.ObtenerPorId(expId);
+            Console.WriteLine($"2. Trámite 'PaseAEstudio' agregado. -> Nuevo Estado: {exp?.Estado}");
 
-        Console.WriteLine("----------------- Sistema de Gestion De Expedientes (SGE) -----------------");
-        // flujo feliz(alta de expediente,tramite y cambios de estado)
-        try{
-        Console.WriteLine("flujo feliz");
-        var altaExpedienteReq= new AgregarExpedienteRequest("Prueba 1", idUsuarioOperador);
-        AgregarExpedienteResponse altaExpedienteRes=altaExpedienteUseCase.Ejecutar(altaExpedienteReq);
-        Guid expedienteId=altaExpedienteRes.Id;
-        Console.WriteLine($"expediente creado. ID{expedienteId}");
-
-        // agregar Tramite
-        var tramite1Req= new AgregarTramiteRequest(expedienteId,EtiquetaTramite.PaseAEstudio,idUsuarioOperador);
-        agregarTramiteUseCase.Ejecutar(tramite1Req);
-
-        // verificar listado de expedientes
-        Console.WriteLine("listado de expedientes: ");
-        var listaExpedentes= listarExpedienteUseCase.Ejecutar();
-        foreach(var e in listaExpedentes)
-            {
-                Console.WriteLine($"ID:{e.Id}, caratula: {e.Caratula},Estado : {e.Estado}, ultmo cambio: {e.fechaModificacion}")
-            }
-        
-
-
-        // agregar segundo tramite
-        var tramite2Req= new AgregarTramiteRequest(expedienteId,EtiquetaTramite.Resolucion,idUsuarioOperador);
-        agregarTramiteUseCase.Ejecutar(tramite2Req);
-        // verificar listado
-        //metodo de listar tramites
-        // cambio manual
-        var cambioEstado = new CambiarEstadoExpedienteRequest(EstadoExpediente.EnNotificacion);
-        CambiarEstadoExpedienteUseCase.Ejecutar(cambioEstado);
-        //listar
-        // metodo de listar tramites
+            // Agregar Trámite 2 -> Muta a ConResolucion
+            altaTramite.Ejecutar(new AgregarTramiteRequest(expId, operadorId, "Firma del Acto (Resolucion)"));
+            exp = repoExpediente.ObtenerPorId(expId);
+            Console.WriteLine($"3. Trámite 'Resolucion' agregado.    -> Nuevo Estado: {exp?.Estado}\n");
         }
         catch (Exception ex)
         {
-            Console.WriteLine("error en camino feliz; Corregir");
+            Console.WriteLine($"❌ Error inesperado: {ex.Message}\n");
         }
 
-        Console.WriteLine("camino de error");
+        // ------------------------------------------------------------
+        // FLUJO 2: CAMINO DE ERROR (Validación del Dominio)
+        // ------------------------------------------------------------
+        Console.WriteLine("[CAMINO DE ERROR]");
+        try
+        {
+            Console.WriteLine("Intentando crear expediente con carátula vacía...");
+            altaExpediente.Ejecutar(new AgregarExpedienteRequest("", operadorId));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"✔️ Excepción capturada con éxito: {ex.Message}");
+        }
 
-        var reqInvalido= new AgregarExpedienteRequest("",idUsuarioOperador);// viola la regla del value object
-        altaExpedienteUseCase.Ejecutar(reqInvalido);
-
+        Console.WriteLine("\n===========================================");
     }
 }
