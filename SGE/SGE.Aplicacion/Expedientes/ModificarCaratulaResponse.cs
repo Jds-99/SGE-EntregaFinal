@@ -2,5 +2,4 @@ using System;
 using SGE.Dominio.Expedientes;
 
 namespace SGE.Aplicacion;
-
-public record  ModificarCaratulaResponse(CaratulaExpendiente caratula, Guid id);
+public record ModificarCaratulaResponse(Guid Id, string CaratulaTexto);

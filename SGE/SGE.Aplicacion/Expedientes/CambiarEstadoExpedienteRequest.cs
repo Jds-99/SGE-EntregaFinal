@@ -3,4 +3,4 @@ using SGE.Dominio.Expedientes;
 
 namespace SGE.Aplicacion;
 
-public record CambiarEstadoExpedienteRequest(EstadoExpediente estado);
+public record CambiarEstadoExpedienteRequest(Guid IdUsuario, Guid ExpedienteId, EstadoExpediente NuevoEstado);
