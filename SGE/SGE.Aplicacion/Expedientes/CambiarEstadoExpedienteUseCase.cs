@@ -1,36 +1,28 @@
 using System;
 using SGE.Dominio.Expedientes;
-using SGE.Aplicacion.Autorizacion; // Ajusta según tus namespaces
 
 namespace SGE.Aplicacion;
 
 public class CambiarEstadoExpedienteUseCase(IExpedienteRepository expedienteRepository, IAutorizacionService autorizacionService)
 {
-
-    private readonly IExpedienteRepository RepositorioExpediente;
-    private readonly IAutorizacionService autorizacionService;
-
-    public CambiarEstadoExpedienteUseCase(IExpedienteRepository RepositorioExpediente, IAutorizacionService autorizacionService)
-    {
-        this.RepositorioExpediente = RepositorioExpediente;
-        this.autorizacionService = autorizacionService;
-    }
-
     public CambiarEstadoExpedienteResponse Ejecutar(CambiarEstadoExpedienteRequest request)
     {
-        if (!autorizacionService.PoseeElPermiso(request.IdUsuario, Permiso.ExpedienteModificacion))
+        // 2. Validar permisos usando el parámetro directo del constructor primario
+        if (!autorizacionService.PoseeElPermiso(request.IdUsuario, Permiso.ExpedienteModificacion.ToString()))
         {
             throw new AutorizacionException("El usuario no tiene permisos para modificar el expediente.");
         }
 
-        var expediente = RepositorioExpediente.ObtenerPorId(request.ExpedienteId);
-        if (expediente == null)
-        {
-            throw new EntidadNoEncontradaException("No se encontró el expediente con el ID provisto.");
-        }
+        // 3. Buscar la entidad usando el repositorio del constructor primario
+        var expediente = expedienteRepository.ObtenerPorId(request.ExpedienteId)
+            ?? throw new EntidadNoEncontradaException("No se encontró el expediente con el ID provisto.");
 
+        // 4. Ejecutar la lógica en tu Dominio Rico (Directiva C)
         expediente.CambiarEstado(request.NuevoEstado, request.IdUsuario);
-        RepositorioExpediente.Modificar(expediente);
+
+        // 5. Persistir en la infraestructura de texto plano
+        expedienteRepository.Modificar(expediente);
+        
         return new CambiarEstadoExpedienteResponse(expediente.Estado);
     }
 }

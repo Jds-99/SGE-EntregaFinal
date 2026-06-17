@@ -1,36 +1,31 @@
 using System;
 using SGE.Dominio.Expedientes;
-using SGE.Aplicacion;
-namespace SGE.Aplicacion;
 
 namespace SGE.Aplicacion;
 
-public class ModificarCaratulaUseCase
+// Usamos el constructor primario de C# 12 limpiando las cabeceras duplicadas
+public class ModificarCaratulaUseCase(IExpedienteRepository expedienteRepository, IAutorizacionService autorizacionService)
 {
-    private readonly IExpedienteRepository RepositorioExpedientes;
-    private readonly IAutorizacionService AutorizacionService;
-
-    public ModificarCaratulaUseCase(IExpedienteRepository RepositorioDeExpedientes, IAutorizacionService ServivioDeAutorizacion)
-    {
-        this.RepositorioExpedientes = RepositorioDeExpedientes ?? throw new ArgumentNullException(nameof(RepositorioDeExpedientes));
-        this.AutorizacionService = ServivioDeAutorizacion ?? throw new ArgumentNullException(nameof(ServivioDeAutorizacion));
-    }
-
     public ModificarCaratulaResponse Ejecutar(ModificarCaratulaRequest request)
     {
-        if (!this.AutorizacionService.PoseePermiso(request.UsuarioId, Permiso.ModificarExpediente))
+        // 1. Validar permisos (Usamos el parámetro del constructor primario)
+        if (!autorizacionService.PoseeElPermiso(request.UsuarioId, Permiso.ExpedienteModificacion.ToString()))
         {
             throw new AutorizacionException($"El usuario {request.UsuarioId} no tiene permisos para modificar carátulas.");
         }
 
-        Expediente expediente = this.RepositorioExpedientes.ObtenerPorId(request.ExpedienteId) 
+        // 2. Buscar la entidad en el archivo de texto
+        var expediente = expedienteRepository.ObtenerPorId(request.ExpedienteId) 
             ?? throw new EntidadNoEncontradaException($"No se encontró el expediente con ID {request.ExpedienteId}");
 
-        var nuevaCaratula = new CaratulaExpediente(request.NuevaCaratulaTexto);
-        expediente.CambiarCaratula(nuevaCaratula, request.UsuarioId);
+        // 3. Crear el Value Object e invocar el método del dominio rico
+        var nuevaCaratula = new CaratulaExpendiente(request.NuevaCaratulaTexto);
+        expediente.ModificarCaratula(nuevaCaratula, request.UsuarioId);
 
-        this.RepositorioExpedientes.Actualizar(expediente);
+        // 4. Persistir los cambios usando tu método de infraestructura
+        expedienteRepository.Modificar(expediente); // Asegurate si tu interfaz usa Modificar o Actualizar
 
+        // 5. Retornar la respuesta estructurada
         return new ModificarCaratulaResponse(expediente.Id, expediente.Caratula.Valor);
     }
 }

@@ -15,7 +15,7 @@ public class Expediente
     public DateTime FechaUltimaModificacion {get; private set;}
     public Guid UsuarioUltimoCambio {get; private set;}
     public EstadoExpediente Estado {get; private set;}
-
+    public List<Tramite> Tramites { get; private set; } = new List<Tramite>();
     //Constructor para usuarios nuevos.
     public Expediente(CaratulaExpendiente Caratula, Guid usuarioUltCambio)
     {
