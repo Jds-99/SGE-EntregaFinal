@@ -1,5 +1,7 @@
 namespace SGE.Aplicacion.Expedientes;
-using SGE.Aplicacion; 
+using SGE.Aplicacion;
+using SGE.Dominio.Expedientes;
+using SGE.Dominio.Tramites;
 
 public class ActualizacionEstadoExpedienteService
 {
@@ -10,18 +12,23 @@ public class ActualizacionEstadoExpedienteService
         _repositorio = repositorio;
     }
 
-    public ActualizacionEstadoExpedienteResponse Ejecutar(ActualizacionEstadoExpedienteRequest request)
+    public bool Ejecutar(Expediente expediente)
     {
-        var expediente = _repositorio.ObtenerPorId(request.ExpedienteId);
-        
+        bool ok= false;
         if (expediente == null)
         {
-            throw new EntidadNoEncontradaException($"No se encontró el expediente {request.ExpedienteId}");
+            return ok;
+            throw new EntidadNoEncontradaException($"No se encontró el expediente {expediente}");
         }
 
-        expediente.CambiarEstado(request.NuevoEstado);
-        _repositorio.Actualizar(expediente);
-        return new ActualizacionEstadoExpedienteResponse("Estado actualizado con éxito");
+        else (expediente.ActualizarEstadoAutomatico(expediente.Id,expediente.Caratula))
+        {
+            ok= true;
+            _repositorio.Modificar(expediente);
+            
+        }
+        
+        return ok;
     }
 }
 

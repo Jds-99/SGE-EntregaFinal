@@ -1,11 +1,11 @@
 using SGE.Aplicacion;
+using SGE.Aplicacion.Expedientes;
 using SGE.Dominio.Expedientes;
 namespace SGE.Aplicacion.Tramites;
 
 public class AgregarTramiteUseCase(
     ITramiteRepository tramiteRepo, 
     IExpedienteRepository expedienteRepo,
-    ActualizacionEstadoExpedienteService estadoService, 
     IAutorizacionService autorizacion)
 {
     public AgregarTramiteResponse Ejecutar(AgregarTramiteRequest request)
@@ -25,7 +25,7 @@ public class AgregarTramiteUseCase(
 
         var nuevoTramite = new Tramite(request.ExpedienteId, request.Detalle, etiquetaEnum);
         tramiteRepo.Agregar(nuevoTramite);
-        estadoService.ActualizarEstado(request.ExpedienteId);
+        ActualizacionEstadoExpedienteService.Ejecutar(request.Etiqueta,request.UsuarioId);
         return new AgregarTramiteResponse(nuevoTramite.Id, nuevoTramite.ExpedienteId, nuevoTramite.Etiqueta.ToString());
     }
 }
