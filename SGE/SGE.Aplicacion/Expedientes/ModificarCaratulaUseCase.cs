@@ -1,7 +1,6 @@
+namespace SGE.Aplicacion.Expedientes;
 using System;
 using SGE.Dominio.Expedientes;
-
-namespace SGE.Aplicacion;
 
 // Usamos el constructor primario de C# 12 limpiando las cabeceras duplicadas
 public class ModificarCaratulaUseCase(IExpedienteRepository expedienteRepository, IAutorizacionService autorizacionService)
@@ -29,3 +28,5 @@ public class ModificarCaratulaUseCase(IExpedienteRepository expedienteRepository
         return new ModificarCaratulaResponse(expediente.Id, expediente.Caratula.Valor);
     }
 }
+public record ModificarCaratulaResponse(Guid Id, string CaratulaTexto);
+public record ModificarCaratulaRequest(string NuevaCaratulaTexto, Guid UsuarioId, Guid ExpedienteId);

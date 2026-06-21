@@ -1,7 +1,6 @@
+namespace SGE.Aplicacion.Expedientes;
 using System;
 using SGE.Dominio.Expedientes;
-
-namespace SGE.Aplicacion;
 
 public class CambiarEstadoExpedienteUseCase(IExpedienteRepository expedienteRepository, IAutorizacionService autorizacionService)
 {
@@ -26,3 +25,6 @@ public class CambiarEstadoExpedienteUseCase(IExpedienteRepository expedienteRepo
         return new CambiarEstadoExpedienteResponse(expediente.Estado);
     }
 }
+
+public record CambiarEstadoExpedienteRequest(Guid IdUsuario, Guid ExpedienteId, EstadoExpediente NuevoEstado);
+public record CambiarEstadoExpedienteResponse(EstadoExpediente estado);

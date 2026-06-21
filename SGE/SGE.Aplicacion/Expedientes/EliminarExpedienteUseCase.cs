@@ -1,7 +1,7 @@
-namespace SGE.Aplicacion;
+namespace SGE.Aplicacion.Expedientes;
 using System;
 using SGE.Dominio.Tramites;
-
+using SGE.Aplicacion.Tramites;
 public class EliminarExpedienteUseCase(IExpedienteRepository expedienteRepo, IAutorizacionService autorizacion, ITramiteRepository tramiteRepo)
 {
     public EliminarExpedienteResponse Ejecutar(EliminarExpedienteRequest request)
@@ -16,19 +16,23 @@ public class EliminarExpedienteUseCase(IExpedienteRepository expedienteRepo, IAu
         
         // 2. Validación de Existencia 
         // Buscamos el expediente una sola vez de forma limpia.
-        IEnumerable<Tramite> lista= tramiteRepo.ObtenerPorExpedienteId(Guid.Parse(request.IdExpediente)); 
         var expediente = expedienteRepo.ObtenerPorId(Guid.Parse(request.IdExpediente))
             ?? throw new EntidadNoEncontradaException($"El expediente con ID {request.IdExpediente} no existe.");
+        //Si existe el expediente, busco todos los tramites con el id Del expediente
+        IEnumerable<Tramite> lista= tramiteRepo.ObtenerPorExpedienteId(Guid.Parse(request.IdExpediente)); 
         
-        // 3. Ejecución de la Acción en la Infraestructura
+        // 3. Elimino todos los tramites 
         foreach(Tramite t in lista)
         {
-            tramiteRepo.Eliminar(Guid.Parse(request.IdExpediente));
+            tramiteRepo.Eliminar(t.Id);
         }
-        
+        // 4 Elimino el expediente
         expedienteRepo.Eliminar(Guid.Parse(request.IdExpediente));
 
-        // 4. Retorno del DTO Response con el formato posicional de tu Record
+        // 5. Retorno del DTO Response con el formato posicional de tu Record
         return new EliminarExpedienteResponse(Exito: true, IdExpedienteEliminado: request.IdExpediente);
     }
 }
+
+public record EliminarExpedienteRequest(string IdExpediente, string UsuarioId);
+public record EliminarExpedienteResponse(bool Exito, string IdExpedienteEliminado);

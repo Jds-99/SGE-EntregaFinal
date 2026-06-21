@@ -31,3 +31,6 @@ public class ObtenerPorIdUseCase(IExpedienteRepository repositorio, IAutorizacio
         );
     }
 }
+
+public record ObtenerPorIdRequest(Guid IdExpediente, Guid IdUsuario);
+public record ObtenerPorIdResponse(Guid IdExpediente, string Caratula, string Estado, List<TramiteDTO> Tramites);

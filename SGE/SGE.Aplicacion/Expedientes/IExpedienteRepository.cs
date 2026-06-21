@@ -1,3 +1,4 @@
+namespace SGE.Aplicacion.Expedientes;
 using SGE.Dominio.Expedientes;
 using SGE.Dominio.Tramites;
 

@@ -1,116 +1,104 @@
+namespace SGE.Infraestructura.Repository;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using SGE.Aplicacion;
 using SGE.Dominio.Tramites;
+using SGE.Aplicacion.Tramites;
 
-namespace SGE.Infraestructura.Tramites;
-
-public class TramiteTxtRepository : ITramiteRepository{
+public class TramiteTxtRepository : ITramiteRepository
+{
     private readonly string _nombreArchivo = "Tramites.txt";
-    public void Agregar(Tramite tramite){
-        using var sw = new StreamWriter(_nombreArchivo, true);
-        EscribirTramiteEnStream(sw, tramite);
+
+    public void Agregar(Tramite tramite)
+    {
+        // append: true para agregar al final
+        using var sw = new StreamWriter(_nombreArchivo, append: true);
+        // Guardamos todo en una sola línea separada por comas
+        sw.WriteLine($"{tramite.Id},{tramite.IdExpediente},{(int)tramite.Etiqueta},{tramite.contenido},{tramite.FechaCreacion:o},{tramite.FechaUltimaModificacion:o},{tramite.UsuarioUlimoCambio}");
     }
 
-    public IEnumerable<Tramite> ObtenerTodos(){
+    public IEnumerable<Tramite> ObtenerTodos()
+    {
         var lista = new List<Tramite>();    
         if (!File.Exists(_nombreArchivo)) return lista;
-        using var sr = new StreamReader(_nombreArchivo);
-        while (!sr.EndOfStream){
-            var id = Guid.Parse(sr.ReadLine() ?? "");
-            var idExpediente = Guid.Parse(sr.ReadLine() ?? "");
-            var etiqueta = (EtiquetaTramite)int.Parse(sr.ReadLine() ?? "0");
-            var contenido = sr.ReadLine() ?? "";
-            var fechaCreacion = DateTime.Parse(sr.ReadLine() ?? "");
-            var fechaUltimaModificacion = DateTime.Parse(sr.ReadLine() ?? "");
-            var usuarioUltimoCambio = Guid.Parse(sr.ReadLine() ?? "");
-            var contenidoVO = new Contenido(contenido);
-            var tramite = Tramite.FactoryMethodTramite(id, idExpediente, usuarioUltimoCambio,contenidoVO,fechaCreacion,fechaUltimaModificacion,etiqueta);
+        
+        // Leemos renglón por renglón
+        string[] lineas = File.ReadAllLines(_nombreArchivo);
+        foreach (string linea in lineas)
+        {
+            if (string.IsNullOrWhiteSpace(linea)) continue;
+
+            string[] datos = linea.Split(',');
+
+            Guid id = Guid.Parse(datos[0]);
+            Guid idExpediente = Guid.Parse(datos[1]);
+            EtiquetaTramite etiqueta = (EtiquetaTramite)int.Parse(datos[2]);
+            string contenidoTexto = datos[3];
+            DateTime fechaCreacion = DateTime.Parse(datos[4]);
+            DateTime fechaUltimaModificacion = DateTime.Parse(datos[5]);
+            Guid usuarioUltimoCambio = Guid.Parse(datos[6]);
+
+            var contenidoVO = new Contenido(contenidoTexto);
+            
+            var tramite = Tramite.FactoryMethodTramite(
+                id, 
+                idExpediente, 
+                usuarioUltimoCambio, 
+                contenidoVO, 
+                fechaCreacion, 
+                fechaUltimaModificacion, 
+                etiqueta
+            );
             lista.Add(tramite);
         }
         return lista; 
     }
-    
-    private void EscribirTramiteEnStream(StreamWriter writer, Tramite tramite){
-        writer.WriteLine(tramite.Id);
-        writer.WriteLine(tramite.IdExpediente);
-        writer.WriteLine((int)tramite.Etiqueta);
-        writer.WriteLine(tramite.contenido); 
-        writer.WriteLine(tramite.FechaCreacion.ToString()); // Formato "o" (round-trip) evita problemas de fechas
-        writer.WriteLine(tramite.FechaUltimaModificacion.ToString());
-        writer.WriteLine(tramite.UsuarioUlimoCambio);
-    }
 
-    private void GuardarTodoElArchivo(List<Tramite> listaTramites){
-        // append: false sobrescribe el archivo por completo. Usamos _nombreArchivo correctamente.
-        using var writer = new StreamWriter(_nombreArchivo, append: false);    
-        foreach (var tramite in listaTramites){
-            EscribirTramiteEnStream(writer, tramite); // Reutilizamos el formato de líneas consecutivas
+    private void GuardarTodoElArchivo(List<Tramite> listaTramites)
+    {
+        // append: false para sobrescribir por completo el archivo
+        using var sw = new StreamWriter(_nombreArchivo, append: false);    
+        foreach (var tramite in listaTramites)
+        {
+            sw.WriteLine($"{tramite.Id},{tramite.IdExpediente},{(int)tramite.Etiqueta},{tramite.contenido},{tramite.FechaCreacion:o},{tramite.FechaUltimaModificacion:o},{tramite.UsuarioUlimoCambio}");
         }
     }
 
-    public void Modificar(Tramite tramiteModificado){
+    public void Modificar(Tramite tramiteModificado)
+    {
         var todos = ObtenerTodos().ToList();
-        int indice = -1;
-        for (int i = 0; i < todos.Count; i++){
-            if (todos[i].Id == tramiteModificado.Id){
-                indice = i;
-                break; 
-            }
-        }
-        if (indice == -1){
+        int indice = todos.FindIndex(t => t.Id == tramiteModificado.Id);
+        
+        if (indice == -1)
+        {
             throw new RepositorioException($"No se encontró el trámite con ID {tramiteModificado.Id} para modificar.");
         }
+        
         todos[indice] = tramiteModificado;
         GuardarTodoElArchivo(todos);
     }
 
-    public void Eliminar(Guid id){
-        var todos = ObtenerTodos().ToList(); // Lo pasamos a lista para poder usar la propiedad .Count de forma segura
+    public void Eliminar(Guid id)
+    {
+        var todos = ObtenerTodos().ToList();
         var listaFiltrada = todos.Where(e => e.Id != id).ToList(); 
-        if (todos.Count == listaFiltrada.Count){
+        
+        if (todos.Count == listaFiltrada.Count)
+        {
             throw new RepositorioException($"No se encontró el trámite con ID {id} para eliminar.");
         }
+        
         GuardarTodoElArchivo(listaFiltrada);
     }
+
     public IEnumerable<Tramite> ObtenerPorExpedienteId(Guid idExpediente)
     {
-        var listaFiltrada = new List<Tramite>();
         if (!File.Exists(_nombreArchivo))
         {
-            return listaFiltrada; // Si no existe, devolvemos la lista vacía 
+            return new List<Tramite>();
         }
-        using (var sr = new StreamReader(_nombreArchivo))
-        {
-            string? linea;
-            // Leemos línea por línea hasta el final del archivo
-            while ((linea = sr.ReadLine()) != null)
-            {
-                string[] campos = linea.Split(';');
-                // Parseamos el ExpedienteId de la línea para ver si coincide con el buscado
-                Guid tramiteExpedienteId = Guid.Parse(campos[1]);
-                if (tramiteExpedienteId == idExpediente)
-                {
-                    // Si coincide, extraemos todos los datos de la línea
-                    Guid id = Guid.Parse(campos[0]);
-                    EtiquetaTramite etiqueta = Enum.Parse<EtiquetaTramite>(campos[2]);
-                    var contenidoVo = new Contenido(campos[3]); // Objeto de Valor
-                    DateTime fechaCreacion = DateTime.Parse(campos[4]);
-                    DateTime fechaModificacion = DateTime.Parse(campos[5]);
-                    Guid usuarioUltimoCambio = Guid.Parse(campos[6]);
-
-                    // Usamos factory method para reconstruir el tramite
-                    Tramite tramiteReconstruido = Tramite.FactoryMethodTramite(
-                        id,                   
-                        tramiteExpedienteId,  
-                        usuarioUltimoCambio,   
-                        contenidoVo,          
-                        fechaCreacion,         
-                        fechaModificacion,    
-                        etiqueta               
-                        );
-                listaFiltrada.Add(tramiteReconstruido);
-            }
-            }
-        }
-        return listaFiltrada;
+        return ObtenerTodos().Where(t => t.IdExpediente == idExpediente).ToList();
     }
 }
