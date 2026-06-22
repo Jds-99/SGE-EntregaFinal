@@ -28,8 +28,8 @@ public class AgregarTramiteUseCase(
         // 4. Intentamos crear el Contenido (Si request.Detalle está vacío, el Dominio va a tirar la excepción acá)
         var contenidoTramite = new Contenido(request.Detalle);
 
-        // 5. Creamos el trámite respetando su constructor real del Dominio (Sin .Parse)
-        var nuevoTramite = new Tramite(request.ExpedienteId, request.UsuarioId, contenidoTramite);
+        // 5. Recreamos el tramite
+        var nuevoTramite = Tramite.FactoryMethodTramite(Guid.NewGuid(),request.ExpedienteId,request.UsuarioId,contenidoTramite,DateTime.Now,DateTime.Now,etiquetaEnum );
         
         // 6. Guardamos el trámite en su repositorio
         tramiteRepo.Agregar(nuevoTramite);

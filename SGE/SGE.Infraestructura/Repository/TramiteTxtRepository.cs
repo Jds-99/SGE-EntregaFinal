@@ -13,10 +13,9 @@ public class TramiteTxtRepository : ITramiteRepository
 
     public void Agregar(Tramite tramite)
     {
-        // append: true para agregar al final
         using var sw = new StreamWriter(_nombreArchivo, append: true);
-        // Guardamos todo en una sola línea separada por comas
-        sw.WriteLine($"{tramite.Id},{tramite.IdExpediente},{(int)tramite.Etiqueta},{tramite.contenido},{tramite.FechaCreacion:o},{tramite.FechaUltimaModificacion:o},{tramite.UsuarioUlimoCambio}");
+        // Cambiamos a punto y coma (;) y accedemos a la propiedad .Valor (o .ToString()) del VO
+        sw.WriteLine($"{tramite.Id};{tramite.IdExpediente};{(int)tramite.Etiqueta};{tramite.contenido};{tramite.FechaCreacion:o};{tramite.FechaUltimaModificacion:o};{tramite.UsuarioUlimoCambio}");
     }
 
     public IEnumerable<Tramite> ObtenerTodos()
@@ -24,13 +23,13 @@ public class TramiteTxtRepository : ITramiteRepository
         var lista = new List<Tramite>();    
         if (!File.Exists(_nombreArchivo)) return lista;
         
-        // Leemos renglón por renglón
         string[] lineas = File.ReadAllLines(_nombreArchivo);
         foreach (string linea in lineas)
         {
             if (string.IsNullOrWhiteSpace(linea)) continue;
 
-            string[] datos = linea.Split(',');
+            // 🌟 Separamos usando punto y coma (;)
+            string[] datos = linea.Split(';');
 
             Guid id = Guid.Parse(datos[0]);
             Guid idExpediente = Guid.Parse(datos[1]);
@@ -58,11 +57,11 @@ public class TramiteTxtRepository : ITramiteRepository
 
     private void GuardarTodoElArchivo(List<Tramite> listaTramites)
     {
-        // append: false para sobrescribir por completo el archivo
         using var sw = new StreamWriter(_nombreArchivo, append: false);    
         foreach (var tramite in listaTramites)
         {
-            sw.WriteLine($"{tramite.Id},{tramite.IdExpediente},{(int)tramite.Etiqueta},{tramite.contenido},{tramite.FechaCreacion:o},{tramite.FechaUltimaModificacion:o},{tramite.UsuarioUlimoCambio}");
+            // Formato consistente con punto y coma (;)
+            sw.WriteLine($"{tramite.Id};{tramite.IdExpediente};{(int)tramite.Etiqueta};{tramite.contenido};{tramite.FechaCreacion:o};{tramite.FechaUltimaModificacion:o};{tramite.UsuarioUlimoCambio}");
         }
     }
 

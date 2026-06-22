@@ -22,7 +22,7 @@ public class ActualizacionEstadoExpedienteService
         
         // 1. Buscamos todos los trámites que pertenezcan a este expediente en el archivo TXT
         var tramitesDelExpediente = _tramiteRepo.ObtenerTodos()
-            .Where(t => t.IdExpediente == expediente.Id);
+            .Where(t => t.IdExpediente == expediente.Id).ToList();
         // 2. Determinamos cuál es el "último" basándonos en la FechaCreacion más reciente
         var ultimoTramite = tramitesDelExpediente
             .OrderByDescending(t => t.FechaCreacion)
