@@ -11,4 +11,8 @@
     <Folder Include="Tramites\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SGE.Aplicacion\SGE.Aplicacion.csproj" />
+  </ItemGroup>
+
 </Project>
