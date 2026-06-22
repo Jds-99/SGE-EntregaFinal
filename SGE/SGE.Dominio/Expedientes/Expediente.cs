@@ -69,21 +69,37 @@ public class Expediente
         }
     }
 
-    public bool ActualizarEstadoAutomatico (EtiquetaTramite? etiqueta, Guid idUsuario)
+    public bool ActualizarEstadoAutomatico(EtiquetaTramite? etiqueta, Guid idUsuario)
     {
-        EstadoExpediente estadoActual = Estado;
-        if (idUsuario == Guid.Empty)
-            throw new DominioExcepcion("Usuario invalido");
-        if (etiqueta.Equals("Escritoresentado")) 
-            return false;
-        if (etiqueta.Equals("PaseAEstudio"))
-            this.Estado = EstadoExpediente.ParaResolver;
-        if (etiqueta.Equals("PaseAlAchivo"))
-            this.Estado = EstadoExpediente.ConResolucion;
-        if (etiqueta.Equals("Finalizado"))
-            this.Estado = EstadoExpediente.RecienIniciado;
-        return (estadoActual!=this.Estado);
+    EstadoExpediente estadoAnterior = this.Estado;
+
+    if (idUsuario == Guid.Empty)
+        throw new DominioExcepcion("Usuario invalido");
+
+    // 🌟 Si es null o es el escrito inicial, no cambia el estado
+    if (etiqueta == null || etiqueta == EtiquetaTramite.EscritoPresentado) 
+        return false;
+
+    // 🌟 Comparamos ENUM contra ENUM de forma directa y segura
+    if (etiqueta == EtiquetaTramite.PaseAEstudio)
+        this.Estado = EstadoExpediente.ParaResolver;
+        
+    else if (etiqueta == EtiquetaTramite.Resolucion) // 🌟 Cambié a Resolucion que es lo que manda tu Program.cs
+        this.Estado = EstadoExpediente.ConResolucion;
+        
+    else if (etiqueta == EtiquetaTramite.PaseAlArchivo)
+        this.Estado = EstadoExpediente.Finalizado;
+
+    // Si el estado actual es distinto al que tenía al principio, mutó.
+    if (this.Estado != estadoAnterior)
+    {
+        this.UsuarioUltimoCambio = idUsuario;
+        this.FechaUltimaModificacion = DateTime.Now;
+        return true; // 🌟 Le avisa al servicio que guarde los cambios en el archivo
     }
+
+    return false;
+}
 
     public void CambiarEstado(EstadoExpediente estado, Guid id)
     {
