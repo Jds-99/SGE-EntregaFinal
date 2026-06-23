@@ -6,7 +6,7 @@ using SGE.Aplicacion.Tramites;
 using SGE.Dominio.Expedientes;
 using SGE.Dominio.Tramites;
 using SGE.Aplicacion.Expedientes;
-
+using SGE.Dominio.Usuarios;
 
 public class ModificarTramiteUseCase(
     ITramiteRepository tramiteRepo, 

@@ -106,4 +106,12 @@ public class Expediente
         if (id == Guid.Empty) throw new DominioExcepcion("id invalido");
         this.Estado=estado;        
     }
+
+    private Expediente()
+    {
+    // EF Core va a usar este constructor "en blanco" y luego inyectará los datos reales 
+    // directamente en las propiedades usando Reflection.
+    Caratula = null!; 
+    Estado = default; // El enum de estado por defecto
+    }
 }

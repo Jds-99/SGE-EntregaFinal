@@ -71,4 +71,8 @@ public class Tramite
         this.UsuarioUlimoCambio = usuarioModificador;
         this.FechaUltimaModificacion = DateTime.Now;
     }
+    private Tramite()
+    {
+        contenido = null!;
+    }
 }

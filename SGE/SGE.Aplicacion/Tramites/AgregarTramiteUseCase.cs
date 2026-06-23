@@ -4,7 +4,7 @@ using SGE.Aplicacion;
 using SGE.Aplicacion.Expedientes;
 using SGE.Dominio.Expedientes;
 using SGE.Dominio.Tramites;
-
+using SGE.Dominio.Usuarios;
 public class AgregarTramiteUseCase(
     ITramiteRepository tramiteRepo, 
     IExpedienteRepository expedienteRepo,

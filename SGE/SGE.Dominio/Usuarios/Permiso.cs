@@ -1,3 +1,4 @@
+namespace SGE.Dominio.Usuarios;
 public enum Permiso
 {
     ExpedienteAlta, 

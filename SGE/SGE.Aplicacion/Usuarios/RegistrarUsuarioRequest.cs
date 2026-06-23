@@ -1,3 +1,5 @@
+using SGE.Dominio.Usuarios;
+
 namespace SGE.Aplicacion;
 
 public class RegistrarUsuarioRequest
