@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using SGE.Dominio.Comun;
-using SGE.Aplicacion;
-namespace SGE.Dominio;
+
+namespace SGE.Dominio.Usuarios;
 
 public class Usuario
 {

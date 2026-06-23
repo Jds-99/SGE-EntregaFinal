@@ -1,6 +1,6 @@
-using SGE.Dominio;
+using SGE.Dominio.Usuarios;
 
-namespace SGE.Aplicacion;
+namespace SGE.Aplicacion.Token;
 
 public interface ITokenService
 {

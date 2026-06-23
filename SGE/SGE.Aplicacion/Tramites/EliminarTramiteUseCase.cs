@@ -2,7 +2,7 @@ namespace SGE.Aplicacion.Tramites;
 using SGE.Aplicacion;
 using SGE.Dominio.Expedientes;
 using SGE.Aplicacion.Expedientes;
-
+using SGE.Dominio.Usuarios;
 public class EliminarTramiteUseCase(ITramiteRepository tramiteRepo, IExpedienteRepository expedienteRepo, ActualizacionEstadoExpedienteService estadoService, 
     IAutorizacionService autorizacion)
 {

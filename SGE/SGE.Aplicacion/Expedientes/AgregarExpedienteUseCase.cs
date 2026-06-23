@@ -1,7 +1,7 @@
 namespace SGE.Aplicacion.Expedientes;
 using SGE.Dominio.Expedientes;
 using SGE.Dominio.Tramites;
-
+using SGE.Dominio.Usuarios;
 public class AgregarExpedienteUseCase
 {
     private readonly IExpedienteRepository repositorio;

@@ -1,6 +1,7 @@
 namespace SGE.Aplicacion.Expedientes;
 using System;
 using SGE.Dominio.Expedientes;
+using SGE.Dominio.Usuarios;
 
 public class CambiarEstadoExpedienteUseCase(IExpedienteRepository expedienteRepository, IAutorizacionService autorizacionService)
 {
