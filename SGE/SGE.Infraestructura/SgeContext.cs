@@ -50,7 +50,28 @@ public class SgeContext : DbContext
 
         entity.HasIndex(u => u.CorreoElectronico).IsUnique();
 
-        entity.Property(u => u.ContraseñaHash).IsRequired();});
-    
+        entity.Property(u => u.ContraseñaHash).IsRequired();
+        
+        // Usuarios de prueba (Seed Data)
+        entity.HasData(
+        // Creamos los objetos usando reflexión o pasando los valores simulando el constructor privado
+                new
+                {
+                    Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                    Nombre = "Admin Inicial",
+                    CorreoElectronico = "admin@sge.com",
+                    ContraseñaHash = "admin123", // Temporal, después usarán hash real
+                    EsAdministrador = true
+                },
+                new
+                {
+                    Id = Guid.Parse("00000000-0000-0000-0000-000000000002"),
+                    Nombre = "Usuario Comun",
+                    CorreoElectronico = "user@sge.com",
+                    ContraseñaHash = "user123",
+                    EsAdministrador = false
+                }
+            );
+        });
     }
 }
