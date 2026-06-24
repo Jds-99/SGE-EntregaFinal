@@ -4,7 +4,7 @@ using SGE.Dominio.Expedientes;
 using SGE.Aplicacion.Expedientes;
 using SGE.Dominio.Usuarios;
 public class EliminarTramiteUseCase(ITramiteRepository tramiteRepo, IExpedienteRepository expedienteRepo, ActualizacionEstadoExpedienteService estadoService, 
-    IAutorizacionService autorizacion)
+    IAutorizacionService autorizacion, IUnidadDeTrabajo unidadDeTrabajo)
 {
     public EliminarTramiteResponse Ejecutar(EliminarTramiteRequest request)
     {
@@ -21,6 +21,7 @@ public class EliminarTramiteUseCase(ITramiteRepository tramiteRepo, IExpedienteR
             ?? throw new EntidadNoEncontradaException($"No existe el expediente asociado con ID {expedienteIdAsociado}");
         
         tramiteRepo.Eliminar(request.IdTramite);
+        unidadDeTrabajo.Guardar();
         // Recalcular el estado del expediente, ya que al borrarse el trámite el "último" cambió
         estadoService.Ejecutar(expediente, expedienteIdAsociado);
         return new EliminarTramiteResponse(Exito: true, IdTramiteEliminado: request.IdTramite);

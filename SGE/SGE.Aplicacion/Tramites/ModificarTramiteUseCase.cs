@@ -12,7 +12,8 @@ public class ModificarTramiteUseCase(
     ITramiteRepository tramiteRepo, 
     IExpedienteRepository expedienteRepo, // Inyectamos el repo para buscar el expediente
     ActualizacionEstadoExpedienteService estadoService, 
-    IAutorizacionService autorizacion)
+    IAutorizacionService autorizacion,
+    IUnidadDeTrabajo unidadDeTrabajo)
 {
     public ModificarTramiteResponse Ejecutar(ModificarTramiteRequest request)
     {
@@ -40,7 +41,7 @@ public class ModificarTramiteUseCase(
 
         // 7. Persistimos los cambios del trámite modificado
         tramiteRepo.Modificar(tramite);
-
+        unidadDeTrabajo.Guardar();
         // 8. Orquestamos la actualización automática de estado mediante el servicio interno
         estadoService.Ejecutar(expediente, request.UsuarioId);
 

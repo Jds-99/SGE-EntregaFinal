@@ -107,7 +107,7 @@ app.MapScalarApiReference(); // Levanta la interfaz gráfica en /scalar
 // porque EscuelaContex fue registrada como “Scoped”
 using (var scope = app.Services.CreateScope()) {
 var context = scope.ServiceProvider.GetRequiredService<SgeContext>();
-Sgesqlite.Inicializar(context);
+sgesqlite.Inicializar(context);
 }
 // Bloque 3: Endpoint de Prueba (Sanity Check)
 app.MapGet("/", () => "¡La API del Sistema de Gestion de Expedientes está funcionando!");
