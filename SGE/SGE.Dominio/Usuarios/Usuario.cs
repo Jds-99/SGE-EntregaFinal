@@ -6,70 +6,95 @@ namespace SGE.Dominio.Usuarios;
 
 public class Usuario
 {
-    public Guid Id {get;private set;}
-    public String? Nombre{get; private set;}
-    public String? CorreoElectronico{get; private set;}
-    public String? ContraseñaHash{ get;private set;}
-    public bool EsAdministrador {get; private set;}
-    // lista de permisos
-    private readonly List<Permiso> _permisos= new List<Permiso>();
-    public IReadOnlyCollection<Permiso> Permisos => _permisos.AsReadOnly();
+    public Guid Id { get; private set; } 
+    public string Nombre { get; private set; } 
+    public string CorreoElectronico { get; private set; } 
+    public string ContraseñaHash { get; private set; } 
+    public bool EsAdministrador { get; private set; } 
+    
+    private readonly List<Permiso> _permisos = new List<Permiso>(); 
+    public IReadOnlyCollection<Permiso> Permisos => _permisos.AsReadOnly(); 
 
-    // constructor privado para la base de datos
-
+    // Constructor privado para ORM / Base de datos
     private Usuario() 
     {
         Id = Guid.NewGuid();
-        Nombre = string.Empty;
-        CorreoElectronico = string.Empty;
-        ContraseñaHash = string.Empty;
+        Nombre = string.Empty; 
+        CorreoElectronico = string.Empty; 
+        ContraseñaHash = string.Empty; 
     }
 
     public Usuario(string nombre, string correoElectronico, string contraseñaHash, bool esAdministrador = false)
     {
-        if (string.IsNullOrWhiteSpace(nombre))
-            throw new DominioExcepcion("El nombre no puede estar vacío.");
-            
-        if (string.IsNullOrWhiteSpace(correoElectronico) || !correoElectronico.Contains("@"))
-            throw new DominioExcepcion("El formato del correo electrónico no es válido.");
+        if (string.IsNullOrWhiteSpace(nombre)) 
+          throw new DominioExcepcion("El nombre no puede estar vacío."); 
+        if (string.IsNullOrWhiteSpace(correoElectronico) || !correoElectronico.Contains("@")) 
+        throw new DominioExcepcion("El formato del correo electrónico no es válido."); 
+        if (string.IsNullOrWhiteSpace(contraseñaHash)) 
+        throw new DominioExcepcion("La contraseña hash no puede estar vacía."); 
 
-        if (string.IsNullOrWhiteSpace(contraseñaHash))
-            throw new DominioExcepcion("La contraseña hash no puede estar vacía.");
-
-        Id = Guid.NewGuid();
-        Nombre = nombre;
-        CorreoElectronico = correoElectronico.Trim().ToLower(); // Normalizamos el correo
-        ContraseñaHash = contraseñaHash;
-        EsAdministrador = esAdministrador;
+            Id = Guid.NewGuid(); 
+            Nombre = nombre; 
+            CorreoElectronico = correoElectronico.Trim().ToLower(); 
+            ContraseñaHash = contraseñaHash; 
+            EsAdministrador = esAdministrador; 
     }
 
-    // asignar permiso
     public void AsignarPermiso(Permiso permiso)
     {
-        // Si es administrador, conceptualmente ya tiene todos los permisos
-        if (EsAdministrador) return;
-
-        if (!_permisos.Contains(permiso))
+       if (EsAdministrador) return; 
+        if (!_permisos.Contains(permiso)) 
         {
             _permisos.Add(permiso);
         }
     }
 
-    // revocar permisos
     public void RevocarPermiso(Permiso permiso)
     {
-        if (_permisos.Contains(permiso))
+       if (_permisos.Contains(permiso))
         {
-            _permisos.Remove(permiso);
+         _permisos.Remove(permiso); 
         }
     }
 
-    // ver si tiene permiso
+    public void ReemplazarPermisos(List<Permiso> nuevosPermisos)
+    {
+        _permisos.Clear(); // Limpiamos sobre la lista privada 
+        if (nuevosPermisos != null) 
+        {
+            foreach (var permiso in nuevosPermisos) 
+            {
+                if (!_permisos.Contains(permiso)) 
+                {
+                    _permisos.Add(permiso); 
+                }
+            }
+        }
+    }
+
     public bool TienePermiso(Permiso permiso)
     {
-        // El administrador siempre tiene acceso a todo
-        if (EsAdministrador) return true;
+        if (EsAdministrador) return true; 
+        return _permisos.Contains(permiso); 
+    }
+
+    // Métodos de comportamiento para modificar datos de forma segura
+    public void ActualizarDatos(string nuevoNombre, string nuevoCorreo)
+    {
+        if (string.IsNullOrWhiteSpace(nuevoNombre))
+            throw new DominioExcepcion("El nombre no puede estar vacío.");
+        if (string.IsNullOrWhiteSpace(nuevoCorreo) || !nuevoCorreo.Contains("@"))
+            throw new DominioExcepcion("El formato del correo electrónico no es válido.");
+
+        Nombre = nuevoNombre;
+        CorreoElectronico = nuevoCorreo.Trim().ToLower();
+    }
+
+    public void CambiarContraseña(string nuevaContraseñaHash)
+    {
+        if (string.IsNullOrWhiteSpace(nuevaContraseñaHash))
+            throw new DominioExcepcion("La contraseña hash no puede estar vacía.");
         
-        return _permisos.Contains(permiso);
+        ContraseñaHash = nuevaContraseñaHash;
     }
 }
