@@ -5,6 +5,7 @@ using SGE.Aplicacion;
 using SGE.Dominio.Expedientes;
 
 namespace SGE.Aplicacion.Expedientes;
+public record ObtenerTodosExpedientesRequest();
 
 public class ObtenerTodosExpedientesUseCase(IExpedienteRepository expedienteRepo)
 {

@@ -28,7 +28,7 @@ public class ObtenerTramitesPorExpedienteIdUseCase(
 }
 
 // DTOs posicionales para la entrada y salida de datos
-public record ObtenerTramitesPorExpedienteIdRequest(Guid ExpedienteId, Guid UsuarioId);
+public record ObtenerTramitesPorExpedienteIdRequest(Guid ExpedienteId);
 public record ObtenerTramitesPorExpedienteIdResponse(List<TramiteDTO> Tramites);
 
 public record TramiteDTO(
