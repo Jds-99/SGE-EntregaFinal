@@ -6,11 +6,13 @@ using SGE.Aplicacion.Expedientes;
 public class ActualizacionEstadoExpedienteService
 {
     private readonly IExpedienteRepository _repositorio;
-    private readonly ITramiteRepository _tramiteRepo; // 🌟 Agregamos el repo de trámites
-    public ActualizacionEstadoExpedienteService(IExpedienteRepository repositorio, ITramiteRepository repositorioTramite)
+    private readonly ITramiteRepository _tramiteRepo; 
+    private readonly IUnidadDeTrabajo _unidadDeTrabajo;
+    public ActualizacionEstadoExpedienteService(IExpedienteRepository repositorio, ITramiteRepository repositorioTramite, IUnidadDeTrabajo unidadDeTrabajo)
     {
         _repositorio = repositorio;
         _tramiteRepo = repositorioTramite;
+        _unidadDeTrabajo = unidadDeTrabajo;
     }
 
     public bool Ejecutar(Expediente expediente, Guid IdUsuario)
@@ -31,10 +33,11 @@ public class ActualizacionEstadoExpedienteService
         EtiquetaTramite? ultimaEtiqueta = ultimoTramite?.Etiqueta;
         // 4. Le pedimos a la entidad rica que evalúe y aplique la regla de negocio
         bool huboCambio = expediente.ActualizarEstadoAutomatico(ultimaEtiqueta, IdUsuario);
-        // 5. Solo si mutó el estado, guardamos el expediente modificado en el archivo
+        // 5. Solo si mutó el estado, guardamos el expediente modificado en el archivo, y persistimos en la base de datos
         if (huboCambio)
         {
             _repositorio.Modificar(expediente);
+            _unidadDeTrabajo.Guardar();
         }
         
         return huboCambio;
