@@ -16,7 +16,7 @@ public class EliminarUsuarioUseCase
     {
         var operador = _repository.ObtenerPorId(request.OperadorId);
         if (operador == null || !operador.EsAdministrador)
-            throw new AutorizacionException("Acción denegada: Se requieren privilegios de administrador."); [cite: 117, 118]
+            throw new AutorizacionException("Acción denegada: Se requieren privilegios de administrador.");
 
         var usuario = _repository.ObtenerPorId(request.UsuarioAEliminar);
         if (usuario == null)
@@ -25,6 +25,5 @@ public class EliminarUsuarioUseCase
         _repository.Eliminar(request.UsuarioAEliminar);
 
         _unitOfWork.Guardar(); 
-    }
     }
 }
