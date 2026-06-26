@@ -1,24 +1,28 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using SGE.Aplicacion; // Donde guardaste tus interfaces (IUnidadDeTrabajo, etc.)
 using SGE.Aplicacion.Expedientes;
 using SGE.Aplicacion.Tramites;
-namespace SGE.Infraestructura.Repository;
+using SGE.Aplicacion.Token;
+using SGE.Infraestructura.Repository;
+namespace SGE.Infraestructura;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfraestructura(this IServiceCollection services)
+    public static IServiceCollection AddInfraestructura(this IServiceCollection services, IConfiguration configuration)
     {
-        // 1. Registramos el Contexto de EF Core
-        services.AddDbContext<SgeContext>();
-
-        // 2. Registramos la Unidad de Trabajo real
+       // A. Base de Datos. Extraemos la cadena de conexión del archivo appsettings.json
+        var connectionString = configuration.GetConnectionString("SGEDb");
+        services.AddDbContext<SgeContext>(opciones => opciones.UseSqlite(connectionString));
+        // B y C. Infraestructura y Seguridad (Scoped)
         services.AddScoped<IUnidadDeTrabajo, UnidadDeTrabajo>();
-
-        // 3. Registramos los Repositorios reales
+        services.AddScoped<ITramiteRepository, TramiteTxtRepository>();
         services.AddScoped<IExpedienteRepository, ExpedienteTxtRepository>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-        // services.AddScoped<ITramiteRepository, TramiteRepository>();
 
+
+        services.AddScoped<IAutorizacionService, AutorizacionService>(); // aca probablemente se cambio algo de lugar
         return services;
     }
 }
