@@ -2,7 +2,7 @@ using System;
 using SGE.Aplicacion;
 using SGE.Dominio.Usuarios;
 
-namespace SGE.Infraestructura.Seguridad;
+namespace SGE.Infraestructura.Repository;
 
 public class AutorizacionService : IAutorizacionService
 {

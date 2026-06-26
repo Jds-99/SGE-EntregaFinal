@@ -33,4 +33,30 @@ public class UsuarioRepository : IUsuarioRepository
     {
         return _context.Usuarios.Find(id);
     }
+    public List<Usuario> ObtenerTodos()
+    {
+        // Trae todas las filas de la tabla Usuarios y las convierte en una Lista de C#
+        return _context.Usuarios.ToList();
+    }
+    public void Modificar(Usuario usuario)
+    {
+        // Le avisa a EF Core que las propiedades de este usuario cambiaron 
+        // para que cuando se llame a Guardar(), genere el comando SQL "UPDATE..."
+        _context.Usuarios.Update(usuario);
+    }
+    public void Eliminar(Guid id)
+    {
+        // Primero buscamos si el usuario existe en la base de datos
+        var usuario = _context.Usuarios.Find(id);
+        
+        if (usuario != null)
+        {
+            // Si lo encuentra, lo marca para borrado. Al Guardar() generará el "DELETE..."
+            _context.Usuarios.Remove(usuario);
+        }
+        else
+        {
+            throw new Exception($"No se puede eliminar el usuario. El ID {id} no existe.");
+        }
+    }
 }

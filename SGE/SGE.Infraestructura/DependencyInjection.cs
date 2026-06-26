@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using SGE.Aplicacion; // Donde guardaste tus interfaces (IUnidadDeTrabajo, etc.)
+using SGE.Aplicacion; 
 using SGE.Aplicacion.Expedientes;
 using SGE.Aplicacion.Tramites;
 using SGE.Aplicacion.Token;
