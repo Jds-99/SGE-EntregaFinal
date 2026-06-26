@@ -69,12 +69,6 @@ app.MapOpenApi(); // Genera el archivo JSON interno
 app.MapScalarApiReference(); // Levanta la interfaz gráfica en /scalar
 }
 
-// Bloque 2: Simulamos un Scope temporal para inicializar SQLite
-// porque SGEContex fue registrada como “Scoped”
-using (var scope = app.Services.CreateScope()) {
-var context = scope.ServiceProvider.GetRequiredService<SgeContext>();
-Sgesqlite.Inicializar(context);//falta la pagina
-}
 // Bloque 3: Endpoint de Prueba (Sanity Check)
 app.MapGet("/", () => "¡La API del Sistema de Gestion de Expedientes está funcionando!");
 

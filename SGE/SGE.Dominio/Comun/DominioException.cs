@@ -1,9 +1,9 @@
 using System;
 namespace SGE.Dominio.Comun;
 
-public class DominioExcepcion : Exception
+public class DominioException : Exception
 {
-    public DominioExcepcion(){}
-    public DominioExcepcion(string? messaje) : base(messaje) {}
-    public DominioExcepcion(string? messaje, Exception? innerException) : base(messaje,innerException){}
+    public DominioException(){}
+    public DominioException(string? messaje) : base(messaje) {}
+    public DominioException(string? messaje, Exception? innerException) : base(messaje,innerException){}
 }

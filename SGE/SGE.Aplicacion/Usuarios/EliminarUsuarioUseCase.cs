@@ -20,7 +20,7 @@ public class EliminarUsuarioUseCase
 
         var usuario = _repository.ObtenerPorId(request.UsuarioAEliminar);
         if (usuario == null)
-            throw new DominioExcepcion("El usuario a eliminar no existe.");
+            throw new DominioException("El usuario a eliminar no existe.");
 
         _repository.Eliminar(request.UsuarioAEliminar);
 

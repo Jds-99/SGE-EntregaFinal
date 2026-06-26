@@ -25,11 +25,11 @@ public class ModificarMisDatosUseCase
     public void Ejecutar(ModificarMisDatosRequest request)
     {
         if (request.UserIdDesdeToken != request.UserIdAModificar)
-            throw new DominioExcepcion("No posee autorización para modificar los datos de otro usuario.");
+            throw new DominioException("No posee autorización para modificar los datos de otro usuario.");
 
         var usuario = _repository.ObtenerPorId(request.UserIdAModificar);
         if (usuario == null)
-            throw new DominioExcepcion("Usuario no encontrado.");
+            throw new DominioException("Usuario no encontrado.");
 
         usuario.ActualizarDatos(request.NuevoNombre, request.NuevoCorreo);
         

@@ -23,15 +23,15 @@ public class Tramite
     {
         // Todas las validaciones de las invariantes centralizadas acá [cite: 57, 80, 82]
         if (id == Guid.Empty)
-            throw new DominioExcepcion("El ID del trámite no puede estar vacío."); 
+            throw new DominioException("El ID del trámite no puede estar vacío."); 
         if (idExpediente == Guid.Empty)
-            throw new DominioExcepcion("El ID del expediente no puede ser nulo o estar vacío."); 
+            throw new DominioException("El ID del expediente no puede ser nulo o estar vacío."); 
         if (usuarioUltimoCambio == Guid.Empty)
-            throw new DominioExcepcion("El usuario no puede estar vacío.");
+            throw new DominioException("El usuario no puede estar vacío.");
         if (contenido == null)
-            throw new DominioExcepcion("El contenido del trámite no puede ser nulo.");
+            throw new DominioException("El contenido del trámite no puede ser nulo.");
         if (fechaCreacion > fechaUltimaModificacion)
-            throw new DominioExcepcion("La fecha de creación no puede ser mayor a la de última modificación."); 
+            throw new DominioException("La fecha de creación no puede ser mayor a la de última modificación."); 
 
         // Asignación efectiva
         this.Id = id;
@@ -57,12 +57,12 @@ public class Tramite
     {
         if (usuarioModificador == Guid.Empty)
         {
-            throw new DominioExcepcion("El usuario que realiza la modificación no puede estar vacío.");
+            throw new DominioException("El usuario que realiza la modificación no puede estar vacío.");
         }
 
         if (nuevoContenido == null)
         {
-            throw new DominioExcepcion("El nuevo contenido del trámite no puede ser nulo.");
+            throw new DominioException("El nuevo contenido del trámite no puede ser nulo.");
         }
 
         // El estado se modifica internamente protegiendo las reglas de negocio

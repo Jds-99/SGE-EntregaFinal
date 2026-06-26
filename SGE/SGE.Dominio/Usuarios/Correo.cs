@@ -16,12 +16,12 @@ public record Correo
     public Correo(string valor)
     {
         if (string.IsNullOrWhiteSpace(valor))
-            throw new DominioExcepcion("El correo electrónico no puede estar vacío.");
+            throw new DominioException("El correo electrónico no puede estar vacío.");
 
         // Validación estándar de formato de email
         var emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
         if (!emailRegex.IsMatch(valor))
-            throw new DominioExcepcion($"El formato del correo '{valor}' no es válido.");
+            throw new DominioException($"El formato del correo '{valor}' no es válido.");
 
         Valor = valor.Trim().ToLower(); // Lo normalizamos a minúsculas
     }

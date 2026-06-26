@@ -27,11 +27,11 @@ public class Usuario
     public Usuario(string nombre, string correoElectronico, string contraseñaHash, bool esAdministrador = false)
     {
         if (string.IsNullOrWhiteSpace(nombre)) 
-          throw new DominioExcepcion("El nombre no puede estar vacío."); 
+          throw new DominioException("El nombre no puede estar vacío."); 
         if (string.IsNullOrWhiteSpace(correoElectronico) || !correoElectronico.Contains("@")) 
-        throw new DominioExcepcion("El formato del correo electrónico no es válido."); 
+        throw new DominioException("El formato del correo electrónico no es válido."); 
         if (string.IsNullOrWhiteSpace(contraseñaHash)) 
-        throw new DominioExcepcion("La contraseña hash no puede estar vacía."); 
+        throw new DominioException("La contraseña hash no puede estar vacía."); 
 
             Id = Guid.NewGuid(); 
             Nombre = nombre; 
@@ -82,9 +82,9 @@ public class Usuario
     public void ActualizarDatos(string nuevoNombre, string nuevoCorreo)
     {
         if (string.IsNullOrWhiteSpace(nuevoNombre))
-            throw new DominioExcepcion("El nombre no puede estar vacío.");
+            throw new DominioException("El nombre no puede estar vacío.");
         if (string.IsNullOrWhiteSpace(nuevoCorreo) || !nuevoCorreo.Contains("@"))
-            throw new DominioExcepcion("El formato del correo electrónico no es válido.");
+            throw new DominioException("El formato del correo electrónico no es válido.");
 
         Nombre = nuevoNombre;
         CorreoElectronico = nuevoCorreo.Trim().ToLower();
@@ -93,7 +93,7 @@ public class Usuario
     public void CambiarContraseña(string nuevaContraseñaHash)
     {
         if (string.IsNullOrWhiteSpace(nuevaContraseñaHash))
-            throw new DominioExcepcion("La contraseña hash no puede estar vacía.");
+            throw new DominioException("La contraseña hash no puede estar vacía.");
         
         ContraseñaHash = nuevaContraseñaHash;
     }

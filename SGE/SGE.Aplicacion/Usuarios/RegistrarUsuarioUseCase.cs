@@ -32,7 +32,7 @@ public class RegistrarUsuarioUseCase
     var usuarioExistente = _usuarioRepository.ObtenerPorCorreo(correoNormalizado);
     if (usuarioExistente is not null)
     {
-        throw new DominioExcepcion("El correo electrónico ya se encuentra registrado.");
+        throw new DominioException("El correo electrónico ya se encuentra registrado.");
     }
 
 

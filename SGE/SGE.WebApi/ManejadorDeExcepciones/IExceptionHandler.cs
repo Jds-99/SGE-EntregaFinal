@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using SGE.Aplicacion;
-using SGE.Dominio;
+using SGE.Dominio.Comun;
 
 namespace SGE.WebApi.ManejadorDeExcepciones;
 
