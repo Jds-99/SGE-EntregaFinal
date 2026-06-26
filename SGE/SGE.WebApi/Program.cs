@@ -7,53 +7,53 @@ using SGE.WebApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using SGE.WebApi.Endpoints; // Necesario para leer el claim "ID"
+using SGE.WebApi.Endpoints;
 
-Console.WriteLine("Iniciando el sistema y verificando base de datos...");
-
-// Instanciamos el contexto. Al ejecutarse el constructor, se va a crear el archivo SQLite solo.
-using (var context = new SgeContext())
-{
-    Console.WriteLine("¡Base de datos verificada/creada con éxito!");
-}
+Console.WriteLine("Iniciando el sistema...");
 
 var builder = WebApplication.CreateBuilder(args);
 
-// IMPORTANTE: En la sección de configuración registrar el provider
+// Registrar el proveedor de Tokens JWT
 builder.Services.AddScoped<ITokenService, JwtTokenProvider>();
 
-// Soporte para el formato estándar de errores
-builder.Services.AddProblemDetails();
-// Registramos nuestro manejador personalizado
-builder.Services.AddExceptionHandler<ManejadorDeExcepcionesGlobales>();
+// Soporte para el formato estándar de errores (RFC 7807)
+builder.Services.AddProblemDetails(); 
 
-// Construimos la aplicación y cerramos la fase de configuración
+// Registramos el manejador personalizado de excepciones globales 🌟 (¡Vuelve a estar activo!)
+builder.Services.AddExceptionHandler<ManejadorDeExcepcionesGlobales>(); 
+
+// Construimos las dependencias de las capas del sistema
 builder.Services.AddOpenApi().AddAplicacion().AddInfraestructura(builder.Configuration);
 
-
-// En el bloque superior donde registramos los servicios)
-// Le decimos a .NET que vamos a usar Autenticación por JWT
+// Configuración del servicio de Autenticación por JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opciones =>
 {
-opciones.TokenValidationParameters = new TokenValidationParameters
-{
-ValidateIssuer = true, // Validar quién lo emitió
-ValidateAudience = true, // Validar para quién es
-ValidateLifetime = true, // Validar que no esté vencido
-ValidateIssuerSigningKey = true, // ¡Vital! Validar la firma criptográfica
-ValidIssuer = builder.Configuration["Jwt:Issuer"],
-ValidAudience = builder.Configuration["Jwt:Audience"],
-IssuerSigningKey = new SymmetricSecurityKey(
-Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-};
+    opciones.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true, 
+        ValidateAudience = true, 
+        ValidateLifetime = true, 
+        ValidateIssuerSigningKey = true, 
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+    };
 });
-// Agregamos el servicio de Autorización (para manejar los roles luego)
-builder.Services.AddAuthorization();
 
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Agregamos el Middleware al principio del Pipeline
+// 🌟 BLOQUE DE INICIALIZACIÓN: Forzamos a EF Core a crear las tablas faltantes usando el Scope correcto
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<SgeContext>();
+    // Si el archivo SGE.sqlite no existe o le faltan las tablas, las crea e inserta la Seed Data ahora
+    context.Database.EnsureCreated(); 
+}
+Console.WriteLine("¡Base de datos y tablas verificadas/creadas con éxito!");
+
+// Activamos el pipeline del manejador de errores global 🌟 (¡Vuelve a estar activo!)
 app.UseExceptionHandler();
 
 // "Descubre quién es" leyendo el token de la cabecera HTTP
@@ -62,19 +62,20 @@ app.UseAuthentication();
 // "Decide si tiene permiso" para acceder a la ruta solicitada
 app.UseAuthorization();
 
-// Solo exponemos esto en modo Desarrollo (seguridad)
+// Documentación de la API con OpenAPI y Scalar en desarrollo
 if (app.Environment.IsDevelopment())
 {
-app.MapOpenApi(); // Genera el archivo JSON interno
-app.MapScalarApiReference(); // Levanta la interfaz gráfica en /scalar
+    app.MapOpenApi(); 
+    app.MapScalarApiReference(); 
 }
 
-// Bloque 3: Endpoint de Prueba (Sanity Check)
+// Endpoint de Prueba (Sanity Check)
 app.MapGet("/", () => "¡La API del Sistema de Gestion de Expedientes está funcionando!");
 
+// Mapeo de Endpoints de cada módulo
 app.MapLoginEndpoint();
 app.MapTramitesEndpoints();
 app.MapExpedientesEndpoints();
 app.MapUsuariosEndpoints();
 
-app.Run(); // Arranca el servidor web (Kestrel)
+app.Run(); // Arranca Kestrel
