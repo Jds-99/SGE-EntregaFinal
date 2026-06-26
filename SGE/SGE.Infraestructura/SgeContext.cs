@@ -11,6 +11,9 @@ public class SgeContext : DbContext
     public DbSet<Tramite> Tramites { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
 
+    public SgeContext(DbContextOptions<SgeContext> options) : base(options)
+    {
+    }
     public SgeContext()
     {
         // Le dice a EF Core: "Si la base de datos SGE.sqlite no existe, 
@@ -19,8 +22,10 @@ public class SgeContext : DbContext
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        // Configuramos la base física en la raíz del proyecto ejecutable
-        optionsBuilder.UseSqlite("Data Source=SGE.sqlite");
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlite("Data Source=SGE.sqlite");
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

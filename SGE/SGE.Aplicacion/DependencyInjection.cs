@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddScoped<ModificarCaratulaUseCase>();
         services.AddScoped<ObtenerPorIdUseCase>();
         services.AddScoped<ObtenerTodosExpedientesUseCase>();
+        services.AddTransient<ActualizacionEstadoExpedienteService>();
 
         services.AddScoped<AgregarTramiteUseCase>();
         services.AddScoped<EliminarTramiteUseCase>();
@@ -24,6 +25,7 @@ public static class DependencyInjection
         services.AddScoped<ObtenerTramitesPorExpedienteIdUseCase>();
 
         services.AddScoped<RegistrarUsuarioUseCase>();
+        services.AddScoped<IPasswordHasher, CryptographyPasswordHasher>();
         // El día de mañana vas a ir agregando los otros acá abajo:
         // services.AddTransient<RegistrarUsuarioUseCase>();
         // services.AddTransient<AltaTramiteUseCase>();
