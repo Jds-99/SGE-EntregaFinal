@@ -36,13 +36,13 @@ public class RegistrarUsuarioUseCase
     }
 
 
-    string hashContraseña = _passwordHasher.HashPassword(request.Contraseña);
+    string hashcontrasenia = _passwordHasher.HashPassword(request.contrasenia);
 
    
     var nuevoUsuario = new Usuario(
         request.Nombre ?? "Usuario sin nombre", 
         correoNormalizado, 
-        hashContraseña, 
+        hashcontrasenia, 
         esAdministrador: false 
     );
 

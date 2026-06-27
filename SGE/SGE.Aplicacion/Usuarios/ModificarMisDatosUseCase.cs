@@ -6,7 +6,7 @@ public record ModificarMisDatosRequest(
     Guid UserIdAModificar, 
     string NuevoNombre, 
     string NuevoCorreo, 
-    string NuevaContraseñaPura
+    string NuevacontraseniaPura
 );
 
 // Modificación en el Caso de Uso:
@@ -33,10 +33,10 @@ public class ModificarMisDatosUseCase
 
         usuario.ActualizarDatos(request.NuevoNombre, request.NuevoCorreo);
         
-        if (!string.IsNullOrWhiteSpace(request.NuevaContraseñaPura))
+        if (!string.IsNullOrWhiteSpace(request.NuevacontraseniaPura))
         {
-            string nuevoHash = _hasher.HashPassword(request.NuevaContraseñaPura);
-            usuario.CambiarContraseña(nuevoHash);
+            string nuevoHash = _hasher.HashPassword(request.NuevacontraseniaPura);
+            usuario.Cambiarcontrasenia(nuevoHash);
         }
 
         _repository.Modificar(usuario);

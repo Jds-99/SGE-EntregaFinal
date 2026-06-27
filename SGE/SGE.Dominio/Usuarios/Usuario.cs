@@ -9,7 +9,7 @@ public class Usuario
     public Guid Id { get; private set; } 
     public string Nombre { get; private set; } 
     public string CorreoElectronico { get; private set; } 
-    public string ContraseñaHash { get; private set; } 
+    public string contraseniaHash { get; private set; } 
     public bool EsAdministrador { get; private set; } 
     
     private readonly List<Permiso> _permisos = new List<Permiso>(); 
@@ -21,22 +21,22 @@ public class Usuario
         Id = Guid.NewGuid();
         Nombre = string.Empty; 
         CorreoElectronico = string.Empty; 
-        ContraseñaHash = string.Empty; 
+        contraseniaHash = string.Empty; 
     }
 
-    public Usuario(string nombre, string correoElectronico, string contraseñaHash, bool esAdministrador = false)
+    public Usuario(string nombre, string correoElectronico, string contraseniaHash, bool esAdministrador = false)
     {
         if (string.IsNullOrWhiteSpace(nombre)) 
           throw new DominioException("El nombre no puede estar vacío."); 
         if (string.IsNullOrWhiteSpace(correoElectronico) || !correoElectronico.Contains("@")) 
         throw new DominioException("El formato del correo electrónico no es válido."); 
-        if (string.IsNullOrWhiteSpace(contraseñaHash)) 
-        throw new DominioException("La contraseña hash no puede estar vacía."); 
+        if (string.IsNullOrWhiteSpace(contraseniaHash)) 
+        throw new DominioException("La contrasenia hash no puede estar vacía."); 
 
             Id = Guid.NewGuid(); 
             Nombre = nombre; 
             CorreoElectronico = correoElectronico.Trim().ToLower(); 
-            ContraseñaHash = contraseñaHash; 
+            contraseniaHash = contraseniaHash; 
             EsAdministrador = esAdministrador; 
     }
 
@@ -90,11 +90,11 @@ public class Usuario
         CorreoElectronico = nuevoCorreo.Trim().ToLower();
     }
 
-    public void CambiarContraseña(string nuevaContraseñaHash)
+    public void Cambiarcontrasenia(string nuevacontraseniaHash)
     {
-        if (string.IsNullOrWhiteSpace(nuevaContraseñaHash))
-            throw new DominioException("La contraseña hash no puede estar vacía.");
+        if (string.IsNullOrWhiteSpace(nuevacontraseniaHash))
+            throw new DominioException("La contrasenia hash no puede estar vacía.");
         
-        ContraseñaHash = nuevaContraseñaHash;
+        contraseniaHash = nuevacontraseniaHash;
     }
 }

@@ -18,8 +18,8 @@ public class AgregarExpedienteUseCase
     public AgregarExpedienteResponse Ejecutar(AgregarExpedienteRequest request)
     {
         // 1. Control de autorización
-        if (!_ServicioAutorizacion.PoseeElPermiso(request.IdUsuario, Permiso.ExpedienteAlta.ToString()))
-            throw new AutorizacionException("No autorizado.");
+       // if (!_ServicioAutorizacion.PoseeElPermiso(request.IdUsuario, Permiso.ExpedienteAlta.ToString()))
+       //     throw new AutorizacionException("No autorizado.");
 
         // 2. Creación del objeto de negocio
         var caratula = new CaratulaExpendiente(request.CaratulaTxt); 

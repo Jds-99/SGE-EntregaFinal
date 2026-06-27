@@ -9,9 +9,9 @@ public class CryptographyPasswordHasher : IPasswordHasher
     public string HashPassword(string password)
     {
         if (string.IsNullOrEmpty(password))
-            throw new AutorizacionException("La contraseña no puede estar vacía.");
+            throw new AutorizacionException("La contrasenia no puede estar vacía.");
 
-        // Convertimos el string de la contraseña a un arreglo de bytes (Input)
+        // Convertimos el string de la contrasenia a un arreglo de bytes (Input)
         byte[] inputBytes = Encoding.UTF8.GetBytes(password);
         
         // Computamos el hash usando SHA-256 de forma eficiente
@@ -29,7 +29,7 @@ public class CryptographyPasswordHasher : IPasswordHasher
 
     public bool VerifyPassword(string password, string hashedPassword)
     {
-        // Volvemos a calcular el hash de la contraseña que viene del Login en texto plano
+        // Volvemos a calcular el hash de la contrasenia que viene del Login en texto plano
         string computedHash = HashPassword(password);
 
         // Comparamos de forma segura si los hashes coinciden (ignoring case por ser Hex)
