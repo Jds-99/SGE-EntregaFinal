@@ -1,0 +1,42 @@
+using Microsoft.Extensions.DependencyInjection;
+using SGE.Aplicacion.Expedientes;
+using SGE.Aplicacion.Tramites;
+
+namespace SGE.Aplicacion;
+
+public static class DependencyInjection
+{
+    public static IServiceCollection AddAplicacion(this IServiceCollection services)
+    {
+        // Registramos los Casos de Uso. 
+        // Se usa Transient porque se crean, ejecutan su acción y se destruyen.
+        //Servicios de expedientes
+        services.AddScoped<AgregarExpedienteUseCase>();
+        services.AddScoped<CambiarEstadoExpedienteUseCase>();
+        services.AddScoped<EliminarExpedienteUseCase>();
+        services.AddScoped<ModificarCaratulaUseCase>();
+        services.AddScoped<ObtenerPorIdUseCase>();
+        services.AddScoped<ObtenerTodosExpedientesUseCase>();
+        
+        //Servicios de tramites
+        services.AddScoped<AgregarTramiteUseCase>();
+        services.AddScoped<EliminarTramiteUseCase>();
+        services.AddScoped<ModificarTramiteUseCase>();
+        services.AddScoped<ObtenerPorIdUseCase>();
+        services.AddScoped<ObtenerTramitesPorExpedienteIdUseCase>();
+        services.AddTransient<ActualizacionEstadoExpedienteService>();
+        //Servicios de usuarios
+        services.AddScoped<RegistrarUsuarioUseCase>();
+        services.AddScoped<EliminarUsuarioUseCase>();
+        services.AddScoped<ModificarPermisosUsuarioUseCase>();
+        services.AddScoped<ModificarMisDatosUseCase>();
+        services.AddScoped<ListarUsuariosUseCase>();
+        services.AddScoped<IPasswordHasher, CryptographyPasswordHasher>();
+        services.AddScoped<LoginUseCase>();
+        // El día de mañana vas a ir agregando los otros acá abajo:
+        // services.AddTransient<RegistrarUsuarioUseCase>();
+        // services.AddTransient<AltaTramiteUseCase>();
+
+        return services;
+    }
+}

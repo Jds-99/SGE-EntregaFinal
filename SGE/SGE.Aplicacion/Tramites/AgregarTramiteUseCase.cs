@@ -4,12 +4,13 @@ using SGE.Aplicacion;
 using SGE.Aplicacion.Expedientes;
 using SGE.Dominio.Expedientes;
 using SGE.Dominio.Tramites;
-
+using SGE.Dominio.Usuarios;
 public class AgregarTramiteUseCase(
     ITramiteRepository tramiteRepo, 
     IExpedienteRepository expedienteRepo,
     IAutorizacionService autorizacion,
-    ActualizacionEstadoExpedienteService estadoService) // Inyectamos el servicio interno
+    ActualizacionEstadoExpedienteService estadoService,
+    IUnidadDeTrabajo unidadDeTrabajo) // Inyectamos el servicio interno
 {
     public AgregarTramiteResponse Ejecutar(AgregarTramiteRequest request)
     {
@@ -34,6 +35,8 @@ public class AgregarTramiteUseCase(
         // 6. Guardamos el trámite en su repositorio
         tramiteRepo.Agregar(nuevoTramite);
 
+        // Persistimos en la base de datos
+        unidadDeTrabajo.Guardar();
         // 7. Ejecutamos el servicio interno pasando los parámetros reales
         estadoService.Ejecutar(expediente, request.UsuarioId);
 

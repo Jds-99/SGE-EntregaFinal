@@ -10,7 +10,7 @@ public record class Contenido
     public Contenido(String valor)
     {
         if (string.IsNullOrWhiteSpace(valor))
-            throw new DominioExcepcion();
+            throw new DominioException();
         Valor = valor.Trim();
     }
     public override string ToString() => Valor;

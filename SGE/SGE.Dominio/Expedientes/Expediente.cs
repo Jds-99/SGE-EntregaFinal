@@ -36,16 +36,16 @@ public class Expediente
     {
         // Centralización de validaciones de Invariantes
         if (id == Guid.Empty) 
-            throw new DominioExcepcion("El id del expediente no puede estar vacío.");
+            throw new DominioException("El id del expediente no puede estar vacío.");
             
         if (usuarioUltCambio == Guid.Empty) 
-            throw new DominioExcepcion("El usuario responsable no puede estar vacío.");
+            throw new DominioException("El usuario responsable no puede estar vacío.");
             
         if (caratula == null) 
-            throw new DominioExcepcion("La carátula del expediente no puede ser nula o estar vacía.");
+            throw new DominioException("La carátula del expediente no puede ser nula o estar vacía.");
             
         if (fechaCreacion > fechaUltModif)
-            throw new DominioExcepcion("La fecha de última modificación no puede ser menor a la de creación.");
+            throw new DominioException("La fecha de última modificación no puede ser menor a la de creación.");
 
         // Asignación efectiva de las propiedades internas
         this.Id = id;
@@ -60,7 +60,7 @@ public class Expediente
     public void ModificarCaratula(CaratulaExpendiente nuevaCaratula, Guid idUsuario)
     {
         if (idUsuario== Guid.Empty)
-            throw new DominioExcepcion("El ID es incorrecto"); 
+            throw new DominioException("El ID es incorrecto"); 
         else // El ID es valido entonces cambio la  caratula.
         {
             this.Caratula=nuevaCaratula;
@@ -74,7 +74,7 @@ public class Expediente
     EstadoExpediente estadoAnterior = this.Estado;
 
     if (idUsuario == Guid.Empty)
-        throw new DominioExcepcion("Usuario invalido");
+        throw new DominioException("Usuario invalido");
 
     // 🌟 Si es null o es el escrito inicial, no cambia el estado
     if (etiqueta == null || etiqueta == EtiquetaTramite.EscritoPresentado) 
@@ -103,7 +103,15 @@ public class Expediente
 
     public void CambiarEstado(EstadoExpediente estado, Guid id)
     {
-        if (id == Guid.Empty) throw new DominioExcepcion("id invalido");
+        if (id == Guid.Empty) throw new DominioException("id invalido");
         this.Estado=estado;        
+    }
+
+    private Expediente()
+    {
+    // EF Core va a usar este constructor "en blanco" y luego inyectará los datos reales 
+    // directamente en las propiedades usando Reflection.
+    Caratula = null!; 
+    Estado = default; // El enum de estado por defecto
     }
 }
