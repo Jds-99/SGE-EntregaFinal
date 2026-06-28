@@ -12,6 +12,7 @@ using SGE.Aplicacion.Expedientes;
 using SGE.Dominio.Usuarios;
 using Microsoft.VisualBasic;
 using SGE.Aplicacion.Tramites;
+using Microsoft.AspNetCore.Mvc;
 Console.WriteLine("Iniciando el sistema...");
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,46 +58,67 @@ using (var scope = app.Services.CreateScope())
     //herramientas del sistema
     var usuarioRepository = services.GetRequiredService<IUsuarioRepository>();
     var passwordHasher = services.GetRequiredService<IPasswordHasher>();
+    // Función auxiliar local para asignarle el ID por atrás a la entidad de Dominio
+    // 📌 Función auxiliar local corregida y sin errores de compilación
+void AsignarIdFijo(Usuario u, Guid idFijo)
+{
+    var tipoActual = typeof(Usuario);
+    
+    // 1. Intentamos buscar la propiedad 'Id' (buscando en mayúscula y minúscula)
+    System.Reflection.PropertyInfo? propiedadId = null;
+    while (tipoActual != null && propiedadId == null)
+    {
+        propiedadId = tipoActual.GetProperty("Id") ?? tipoActual.GetProperty("id");
+        tipoActual = tipoActual.BaseType!; // Si no está acá, sube a la clase base (ej: Entidad)
+    }
+
+    if (propiedadId != null && propiedadId.CanWrite)
+    {
+        propiedadId.SetValue(u, idFijo);
+        return;
+    }
+
+    // 2. Si no pudimos por propiedad (porque es de solo lectura), modificamos el campo privado por atrás
+    tipoActual = typeof(Usuario);
+    System.Reflection.FieldInfo? campoId = null;
+    while (tipoActual != null && campoId == null)
+    {
+        campoId = tipoActual.GetField("_id", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                  ?? tipoActual.GetField("id", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        tipoActual = tipoActual.BaseType!;
+    }
+
+    campoId?.SetValue(u, idFijo);
+}
     //verificamos si el admin existe en bd
     var adminExistente = usuarioRepository.ObtenerPorCorreo("admin@sge.com");
     if(adminExistente == null)
     {
-        var nuevoAdmin = new {Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-                              Nombre = "Admin inicial",
-                              CorreoElectronico = "admin@sge.com",
-                              contraseniaHash = passwordHasher.HashPassword("admin123"),
-                              EsAdministrador = true
-                              }; 
-        //ef core agrega este objeto en el set de usuarios
-        context.Set<Usuario>().Add((dynamic)nuevoAdmin);
+        // 💡 Instanciamos el objeto REAL de tu dominio (Acomodá los parámetros según tu constructor)
+        var nuevoAdmin = new Usuario("Admin inicial", "admin@sge.com", passwordHasher.HashPassword("admin123"), true);
+        
+        // Le clavamos el ID fijo de prueba
+        AsignarIdFijo(nuevoAdmin, Guid.Parse("00000000-0000-0000-0000-000000000001"));
+        
+        context.Set<Usuario>().Add(nuevoAdmin); // Ahora sí va una entidad real
         
     }
     // 2. VERIFICAMOS E INSERTAMOS EL OPERADOR 1
     var op1Existente = usuarioRepository.ObtenerPorCorreo("operador1@sge.com");
     if (op1Existente == null)
     {
-        var nuevoOp1 = new {
-            Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), 
-            Nombre = "Operador Uno",
-            CorreoElectronico = "operador1@sge.com",
-            contraseniaHash = passwordHasher.HashPassword("123operador"),
-            EsAdministrador = false // 👈 No es admin, es operador común
-        };
-        context.Set<Usuario>().Add((dynamic)nuevoOp1);
+        var nuevoOp1 = new Usuario("Operador Uno", "operador1@sge.com", passwordHasher.HashPassword("123operador"), false);
+        AsignarIdFijo(nuevoOp1, Guid.Parse("00000000-0000-0000-0000-000000000002"));
+        context.Set<Usuario>().Add(nuevoOp1);
     }
 
     // 3. VERIFICAMOS E INSERTAMOS EL OPERADOR 2
     var op2Existente = usuarioRepository.ObtenerPorCorreo("operador2@sge.com");
     if (op2Existente == null)
     {
-        var nuevoOp2 = new {
-            Id = Guid.Parse("00000000-0000-0000-0000-000000000003"), 
-            Nombre = "Operador Dos",
-            CorreoElectronico = "operador2@sge.com",
-            contraseniaHash = passwordHasher.HashPassword("123operador"),
-            EsAdministrador = false // 👈 No es admin, es operador común
-        };
-        context.Set<Usuario>().Add((dynamic)nuevoOp2);
+        var nuevoOp2 = new Usuario("Operador Dos", "operador2@sge.com", passwordHasher.HashPassword("123operador"), false);
+        AsignarIdFijo(nuevoOp2, Guid.Parse("00000000-0000-0000-0000-000000000003"));
+        context.Set<Usuario>().Add(nuevoOp2);
     }
     context.SaveChanges();
 }
@@ -127,7 +149,7 @@ app.MapGet("/", () => "¡La API del Sistema de Gestion de Expedientes está func
 var usuariosApi = app.MapGroup("/api/usuarios");
 
 // 1. POST: Registrar un usuario nuevo (Alta)
-usuariosApi.MapPost("/", (RegistrarUsuarioRequest request, RegistrarUsuarioUseCase useCase) =>
+usuariosApi.MapPost("/", (RegistrarUsuarioRequest request,[FromServices] RegistrarUsuarioUseCase useCase) =>
 {
     useCase.Ejecutar(request);
     return Results.Created($"/api/usuarios", new { Mensaje = "Usuario registrado exitosamente." });
@@ -135,14 +157,14 @@ usuariosApi.MapPost("/", (RegistrarUsuarioRequest request, RegistrarUsuarioUseCa
 
 // 2. POST: Login de Usuario (PÚBLICO)
 // Nota: A este NO le ponemos .RequireAuthorization() porque cualquiera tiene que poder loguearse.
-usuariosApi.MapPost("/login", (LoginRequest request, LoginUseCase useCase) =>
+usuariosApi.MapPost("/login", (LoginRequest request,[FromServices] LoginUseCase useCase) =>
 {
     var response = useCase.Ejecutar(request);
     return Results.Ok(response); // Devuelve el token, nombre, etc.
 });
 
 // 3. PUT: Modificar Mis Datos (PROTEGIDO)
-usuariosApi.MapPut("/mis-datos", (System.Security.Claims.ClaimsPrincipal user, ModificarMisDatosBody body,ModificarMisDatosUseCase useCase) =>
+usuariosApi.MapPut("/mis-datos", (System.Security.Claims.ClaimsPrincipal user, ModificarMisDatosBody body,[FromServices]ModificarMisDatosUseCase useCase) =>
 {
     // Extraemos el ID del usuario desde el Token JWT
     var userIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
@@ -172,7 +194,7 @@ usuariosApi.MapPut("/mis-datos", (System.Security.Claims.ClaimsPrincipal user, M
 }).RequireAuthorization();
 
 /// 4. GET: Listar todos los usuarios pasándole el OperadorId desde el Token
-usuariosApi.MapGet("/", (System.Security.Claims.ClaimsPrincipal user, ListarUsuariosUseCase useCase) =>
+usuariosApi.MapGet("/", (System.Security.Claims.ClaimsPrincipal user, [FromServices]ListarUsuariosUseCase useCase) =>
 {
     // 1. Extraemos el ID del usuario que está navegando desde su Token JWT
     var userIdClaim = user.FindFirst(System.Security.Claims.ClaimsIdentity.DefaultNameClaimType)?.Value 
@@ -195,7 +217,7 @@ usuariosApi.MapGet("/", (System.Security.Claims.ClaimsPrincipal user, ListarUsua
 }).RequireAuthorization(); // Candado activo
 
 // 4. DELETE: Eliminar un usuario por su ID usando tu clase Request real
-usuariosApi.MapDelete("/{id:guid}", (Guid id, System.Security.Claims.ClaimsPrincipal user, EliminarUsuarioUseCase useCase) =>
+usuariosApi.MapDelete("/{id:guid}", (Guid id, System.Security.Claims.ClaimsPrincipal user,[FromServices] EliminarUsuarioUseCase useCase) =>
 {
     // Extraemos el ID del administrador/operador desde el Token
     var userIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
@@ -222,7 +244,7 @@ usuariosApi.MapDelete("/{id:guid}", (Guid id, System.Security.Claims.ClaimsPrinc
 
 // 5. PUT: Modificar Permisos de un Usuario (PROTEGIDO - Solo Administradores)
 // Pasamos el ID del usuario a modificar por la URL (ej: /api/usuarios/5/permisos)
-usuariosApi.MapPut("/{id:guid}/permisos", (Guid id, System.Security.Claims.ClaimsPrincipal user, ModificarPermisosBody body,ModificarPermisosUsuarioUseCase useCase) =>
+usuariosApi.MapPut("/{id:guid}/permisos", (Guid id, System.Security.Claims.ClaimsPrincipal user, ModificarPermisosBody body,[FromServices]ModificarPermisosUsuarioUseCase useCase) =>
 {
     // 1. Extraemos el ID del Administrador (Operador) desde el Token JWT
     var adminIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
@@ -255,14 +277,14 @@ usuariosApi.MapPut("/{id:guid}/permisos", (Guid id, System.Security.Claims.Claim
 var expedientesApi = app.MapGroup("/api/expedientes");
 
 // 1. GET: Listar todos (El que te dio la profe)
-expedientesApi.MapGet("/", (ObtenerTodosExpedientesUseCase useCase) =>
+expedientesApi.MapGet("/", ([FromServices]ObtenerTodosExpedientesUseCase useCase) =>
 {
     var res = useCase.Ejecutar(); 
     return Results.Ok(res);
 });
 
 // 2. POST: Crear un expediente 
-expedientesApi.MapPost("/", ( AgregarExpedienteRequest request, AgregarExpedienteUseCase useCase) =>
+expedientesApi.MapPost("/", ( AgregarExpedienteRequest request,[FromServices] AgregarExpedienteUseCase useCase) =>
 {
     // Supongamos que tu Request en C# recibe un IdUsuario. 
     // Si es un GUID hardcodeado de tu usuario administrador semilla, lo creamos acá:
@@ -281,14 +303,14 @@ expedientesApi.MapPost("/", ( AgregarExpedienteRequest request, AgregarExpedient
 // 3. PUT Cambiar Estado
         expedientesApi.MapPut("/cambiar-estado", (
             CambiarEstadoExpedienteRequest request, 
-            CambiarEstadoExpedienteUseCase useCase
+            [FromServices]CambiarEstadoExpedienteUseCase useCase
         ) =>
         {
             var response = useCase.Ejecutar(request);
             return Results.Ok(response);
         }).RequireAuthorization();
 // 4. DELETE: Eliminar un expediente recibiendo una Request
-expedientesApi.MapDelete("/{id:guid}", (Guid id, EliminarExpedienteUseCase useCase) =>
+expedientesApi.MapDelete("/{id:guid}", (Guid id,[FromServices] EliminarExpedienteUseCase useCase) =>
 {
     // Armamos el objeto Request que exige el método Ejecutar
     var req = new EliminarExpedienteRequest(id.ToString(),"Usuario"); 
@@ -302,7 +324,7 @@ expedientesApi.MapDelete("/{id:guid}", (Guid id, EliminarExpedienteUseCase useCa
  // 5. PUT Modificar Carátula
         expedientesApi.MapPut("/modificar-caratula", (
             ModificarCaratulaRequest request, 
-             ModificarCaratulaUseCase useCase
+             [FromServices]ModificarCaratulaUseCase useCase
         ) =>
         {
             var response = useCase.Ejecutar(request);
@@ -312,7 +334,7 @@ expedientesApi.MapDelete("/{id:guid}", (Guid id, EliminarExpedienteUseCase useCa
         expedientesApi.MapGet("/{expedienteId:guid}/tramites", (
             Guid expedienteId, 
             System.Security.Claims.ClaimsPrincipal user, 
-           ObtenerPorIdUseCase useCase
+           [FromServices]ObtenerPorIdUseCase useCase
         ) =>
         {
             var userIdString = user.FindFirst("ID")?.Value;
@@ -331,7 +353,7 @@ var tramitesApi = app.MapGroup("/api/tramites").WithTags("Gestión de Trámites"
         tramitesApi.MapPost("/", (
              AgregarTramiteRequest request, 
             System.Security.Claims.ClaimsPrincipal user, 
-             AgregarTramiteUseCase useCase
+             [FromServices]AgregarTramiteUseCase useCase
         ) =>
         {
             var response = useCase.Ejecutar(request);
@@ -342,7 +364,7 @@ var tramitesApi = app.MapGroup("/api/tramites").WithTags("Gestión de Trámites"
         tramitesApi.MapDelete("/{tramiteId:guid}", (
             Guid tramiteId, 
             System.Security.Claims.ClaimsPrincipal user, 
-            EliminarTramiteUseCase useCase
+           [FromServices] EliminarTramiteUseCase useCase
         ) =>
         {
             var userIdString = user.FindFirst("ID")?.Value;
@@ -355,7 +377,7 @@ var tramitesApi = app.MapGroup("/api/tramites").WithTags("Gestión de Trámites"
         // 3. PUT Modificar Trámite (Arreglado)
         tramitesApi.MapPut("/modificar-tramite", (
              ModificarTramiteRequest request, 
-             ModificarTramiteUseCase useCase
+             [FromServices]ModificarTramiteUseCase useCase
         ) =>
         {
             var response = useCase.Ejecutar(request);
@@ -366,7 +388,7 @@ var tramitesApi = app.MapGroup("/api/tramites").WithTags("Gestión de Trámites"
         tramitesApi.MapGet("/{tramiteId:guid}/Tramite", (
             Guid tramiteId, 
             System.Security.Claims.ClaimsPrincipal user, 
-             ObtenerTramitePorIdUseCase useCase
+            [FromServices] ObtenerTramitePorIdUseCase useCase
         ) =>
         {
             var userIdString = user.FindFirst("ID")?.Value;
@@ -378,7 +400,7 @@ var tramitesApi = app.MapGroup("/api/tramites").WithTags("Gestión de Trámites"
 
         // 5. GET Listar por Expediente Id 
         tramitesApi.MapGet("/Tramites", (
-             ObtenerTramitesPorExpedienteIdUseCase useCase, 
+             [FromServices]ObtenerTramitesPorExpedienteIdUseCase useCase, 
              Guid expedienteId // Le indicamos explícitamente de dónde sale
         ) =>
         {
