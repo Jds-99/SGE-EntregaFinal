@@ -22,7 +22,7 @@ public static class DependencyInjection
         services.AddScoped<AgregarTramiteUseCase>();
         services.AddScoped<EliminarTramiteUseCase>();
         services.AddScoped<ModificarTramiteUseCase>();
-        services.AddScoped<ObtenerPorIdUseCase>();
+        services.AddScoped<ObtenerTramitePorIdUseCase>();
         services.AddScoped<ObtenerTramitesPorExpedienteIdUseCase>();
         services.AddTransient<ActualizacionEstadoExpedienteService>();
         //Servicios de usuarios
