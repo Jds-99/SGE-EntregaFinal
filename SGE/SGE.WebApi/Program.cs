@@ -100,7 +100,7 @@ app.MapTramitesEndpoints();
 //app.MapUsuariosEndpoints();
 
 // ==========================================
-// 👥 MÓDULO DE USUARIOS (Formato de la Cátedra)
+// 👥 MÓDULO DE USUARIOS 
 // ==========================================
 var usuariosApi = app.MapGroup("/api/usuarios");
 
@@ -111,7 +111,45 @@ usuariosApi.MapPost("/", (RegistrarUsuarioRequest request, RegistrarUsuarioUseCa
     return Results.Created($"/api/usuarios", new { Mensaje = "Usuario registrado exitosamente." });
 }).RequireAuthorization(); // Protegido: Solo usuarios logueados (o admins) deberían crear usuarios
 
-/// 2. GET: Listar todos los usuarios pasándole el OperadorId desde el Token
+// 2. POST: Login de Usuario (PÚBLICO)
+// Nota: A este NO le ponemos .RequireAuthorization() porque cualquiera tiene que poder loguearse.
+usuariosApi.MapPost("/login", (LoginRequest request, LoginUseCase useCase) =>
+{
+    var response = useCase.Ejecutar(request);
+    return Results.Ok(response); // Devuelve el token, nombre, etc.
+});
+
+// 3. PUT: Modificar Mis Datos (PROTEGIDO)
+usuariosApi.MapPut("/mis-datos", (System.Security.Claims.ClaimsPrincipal user, ModificarMisDatosBody body,ModificarMisDatosUseCase useCase) =>
+{
+    // Extraemos el ID del usuario desde el Token JWT
+    var userIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
+                      ?? user.FindFirst("id")?.Value;
+
+    if (string.IsNullOrEmpty(userIdClaim))
+    {
+        return Results.Problem(detail: "Token inválido o ausente.", statusCode: 401);
+    }
+
+    var idUsuarioLogueado = Guid.Parse(userIdClaim);
+
+    // Armamos el Request que el Caso de Uso exige, inyectando el ID del token en ambos campos de ID 
+    var request = new ModificarMisDatosRequest(
+        UserIdDesdeToken: idUsuarioLogueado,
+        UserIdAModificar: idUsuarioLogueado, // Como modifica sus PROPIOS datos, pasamos el mismo ID
+        NuevoNombre: body.NuevoNombre,
+        NuevoCorreo: body.NuevoCorreo,
+        NuevacontraseniaPura: body.NuevacontraseniaPura
+    );
+
+    //  Ejecutamos el Caso de Uso (que es void, no devuelve nada)
+    useCase.Ejecutar(request);
+
+    // Respondemos con éxito
+    return Results.Ok(new { Mensaje = "Tus datos se actualizaron correctamente." });
+}).RequireAuthorization();
+
+/// 4. GET: Listar todos los usuarios pasándole el OperadorId desde el Token
 usuariosApi.MapGet("/", (System.Security.Claims.ClaimsPrincipal user, ListarUsuariosUseCase useCase) =>
 {
     // 1. Extraemos el ID del usuario que está navegando desde su Token JWT
@@ -134,10 +172,10 @@ usuariosApi.MapGet("/", (System.Security.Claims.ClaimsPrincipal user, ListarUsua
     return Results.Ok(response);
 }).RequireAuthorization(); // Candado activo
 
-// 3. DELETE: Eliminar un usuario por su ID usando tu clase Request real
+// 4. DELETE: Eliminar un usuario por su ID usando tu clase Request real
 usuariosApi.MapDelete("/{id:guid}", (Guid id, System.Security.Claims.ClaimsPrincipal user, EliminarUsuarioUseCase useCase) =>
 {
-    // 1. Extraemos el ID del administrador/operador desde el Token
+    // Extraemos el ID del administrador/operador desde el Token
     var userIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
                       ?? user.FindFirst("id")?.Value;
                       
@@ -148,20 +186,49 @@ usuariosApi.MapDelete("/{id:guid}", (Guid id, System.Security.Claims.ClaimsPrinc
 
     var idUsuarioOperador = Guid.Parse(userIdClaim);
 
-    // 2. Instanciamos tu clase asignando las propiedades por su nombre real 🎯
+    // Instanciamos tu clase asignando las propiedades por su nombre real 
     var req = new EliminarUsuarioRequest 
     { 
         OperadorId = idUsuarioOperador,
         UsuarioAEliminar = id // El ID que viene desde la URL
     };
 
-    // 3. Se lo mandamos al caso de uso
+    // Se lo mandamos al caso de uso
     useCase.Ejecutar(req);
     return Results.NoContent(); // 204 OK
 }).RequireAuthorization();
 
+// 5. PUT: Modificar Permisos de un Usuario (PROTEGIDO - Solo Administradores)
+// Pasamos el ID del usuario a modificar por la URL (ej: /api/usuarios/5/permisos)
+usuariosApi.MapPut("/{id:guid}/permisos", (Guid id, System.Security.Claims.ClaimsPrincipal user, ModificarPermisosBody body,ModificarPermisosUsuarioUseCase useCase) =>
+{
+    // 1. Extraemos el ID del Administrador (Operador) desde el Token JWT
+    var adminIdClaim = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value 
+                      ?? user.FindFirst("id")?.Value;
+
+    if (string.IsNullOrEmpty(adminIdClaim))
+    {
+        return Results.Problem(detail: "Token inválido o ausente.", statusCode: 401);
+    }
+
+    var idAdminOperador = Guid.Parse(adminIdClaim);
+
+    // 2. Armamos el Request completo que exige tu Caso de Uso 🎯
+    var request = new ModificarPermisosRequest
+    {
+        UsuarioId = id,                         // Tomado del parámetro de la URL
+        NuevosPermisos = body.NuevosPermisos,   // Tomado del Body enviado por Postman
+        IdUsuarioOperador = idAdminOperador     // Tomado del Token JWT de forma segura
+    };
+
+    // 3. Ejecutamos el Caso de Uso y capturamos su Response
+    var response = useCase.Ejecutar(request);
+
+    // 4. Retornamos el resultado del caso de uso
+    return Results.Ok(response);
+}).RequireAuthorization();
 // ==========================================
-// 📂 MÓDULO DE EXPEDIENTES (Formato de la Cátedra)
+// 📂 MÓDULO DE EXPEDIENTES 
 // ==========================================
 var expedientesApi = app.MapGroup("/api/expedientes");
 
@@ -189,8 +256,16 @@ expedientesApi.MapPost("/", ( AgregarExpedienteRequest request, AgregarExpedient
     var expedienteCreado = useCase.Ejecutar(requestConUsuario);
     return Results.Created($"/api/expedientes/{expedienteCreado.IdExpediente}", expedienteCreado);
 });
-
-// 3. DELETE: Eliminar un expediente recibiendo una Request
+// 3. PUT Cambiar Estado
+        expedientesApi.MapPut("/cambiar-estado", (
+            CambiarEstadoExpedienteRequest request, 
+            CambiarEstadoExpedienteUseCase useCase
+        ) =>
+        {
+            var response = useCase.Ejecutar(request);
+            return Results.Ok(response);
+        }).RequireAuthorization();
+// 4. DELETE: Eliminar un expediente recibiendo una Request
 expedientesApi.MapDelete("/{id:guid}", (Guid id, EliminarExpedienteUseCase useCase) =>
 {
     // Armamos el objeto Request que exige el método Ejecutar
@@ -202,6 +277,95 @@ expedientesApi.MapDelete("/{id:guid}", (Guid id, EliminarExpedienteUseCase useCa
     useCase.Ejecutar(req);
     return Results.NoContent(); // HTTP 204: Todo salió bien, pero no hay contenido que devolver
 });
+ // 5. PUT Modificar Carátula
+        expedientesApi.MapPut("/modificar-caratula", (
+            ModificarCaratulaRequest request, 
+             ModificarCaratulaUseCase useCase
+        ) =>
+        {
+            var response = useCase.Ejecutar(request);
+            return Results.Ok(response);
+        }).RequireAuthorization();
+// 5. GET Trámites por Expediente
+        ExpedientesApi.MapGet("/{expedienteId:guid}/tramites", (
+            Guid expedienteId, 
+            ClaimsPrincipal user, 
+            [FromServices] ObtenerPorIdUseCase useCase
+        ) =>
+        {
+            var userIdString = user.FindFirst("ID")?.Value;
+            var idUsuario = Guid.Parse(userIdString!);
+            
+            var request = new ObtenerPorIdRequest(expedienteId, idUsuario);
+            var response = useCase.Ejecutar(request);
+            return Results.Ok(response);
+        }).RequireAuthorization();
+// ==========================================
+// 📂 MÓDULO DE TRAMITES 
+// ==========================================
+var tramitesApi = app.MapGroup("/api/tramites").WithTags("Gestión de Trámites");
+
+        // 1. POST (Arreglado)
+        tramitesApi.MapPost("/", (
+             AgregarTramiteRequest request, 
+            ClaimsPrincipal user, 
+             AgregarTramiteUseCase useCase
+        ) =>
+        {
+            var response = useCase.Ejecutar(request);
+            return Results.Created($"/api/tramites/{response.Id}", response);
+        }).RequireAuthorization();
+
+        // 2. DELETE (Arreglado)
+        tramitesApi.MapDelete("/{tramiteId:guid}", (
+            Guid tramiteId, 
+            ClaimsPrincipal user, 
+            EliminarTramiteUseCase useCase
+        ) =>
+        {
+            var userIdString = user.FindFirst("ID")?.Value;
+            var idUsuario = Guid.Parse(userIdString!);
+            var request = new EliminarTramiteRequest(tramiteId, idUsuario);
+            var response = useCase.Ejecutar(request);
+            return Results.Ok(response);
+        }).RequireAuthorization();
+
+        // 3. PUT Modificar Trámite (Arreglado)
+        tramitesApi.MapPut("/modificar-tramite", (
+             ModificarTramiteRequest request, 
+             ModificarTramiteUseCase useCase
+        ) =>
+        {
+            var response = useCase.Ejecutar(request);
+            return Results.Ok(response);
+        }).RequireAuthorization()
+
+        // 4. GET Obtener por Id 
+        tramitesApi.MapGet("/{tramiteId:guid}/Tramite", (
+            Guid tramiteId, 
+            ClaimsPrincipal user, 
+             ObtenerTramitePorIdUseCase useCase
+        ) =>
+        {
+            var userIdString = user.FindFirst("ID")?.Value;
+            var idUsuario = Guid.Parse(userIdString!);
+            var request = new ObtenerTramitePorIdRequest(tramiteId, idUsuario);
+            var response = useCase.Ejecutar(request);
+            return Results.Ok(response);
+        }).RequireAuthorization();
+
+        // 5. GET Listar por Expediente Id 
+        tramitesApi.MapGet("/Tramites", (
+             ObtenerTramitesPorExpedienteIdUseCase useCase, 
+             Guid expedienteId // Le indicamos explícitamente de dónde sale
+        ) =>
+        {
+            var request = new ObtenerTramitesPorExpedienteIdRequest(expedienteId);
+            var response = useCase.Ejecutar(request);
+            return Results.Ok(response);
+        }).RequireAuthorization();
+
 app.Run(); // Arranca Kestrel
 
-
+public record ModificarPermisosBody(List<SGE.Dominio.Usuarios.Permiso> NuevosPermisos);
+public record ModificarMisDatosBody(string NuevoNombre, string NuevoCorreo, string NuevacontraseniaPura);
