@@ -146,7 +146,7 @@ app.MapGet("/", () => "¡La API del Sistema de Gestion de Expedientes está func
 // ==========================================
 // 👥 MÓDULO DE USUARIOS 
 // ==========================================
-var usuariosApi = app.MapGroup("/api/usuarios");
+var usuariosApi = app.MapGroup("/api/usuarios").WithTags("Gestión de Usuarios");
 
 // 1. POST: Registrar un usuario nuevo (Alta)
 usuariosApi.MapPost("/", (RegistrarUsuarioRequest request,[FromServices] RegistrarUsuarioUseCase useCase) =>
@@ -274,7 +274,7 @@ usuariosApi.MapPut("/{id:guid}/permisos", (Guid id, System.Security.Claims.Claim
 // ==========================================
 // 📂 MÓDULO DE EXPEDIENTES 
 // ==========================================
-var expedientesApi = app.MapGroup("/api/expedientes");
+var expedientesApi = app.MapGroup("/api/expedientes").WithTags("Gestión de Expedientes");
 
 // 1. GET: Listar todos (El que te dio la profe)
 expedientesApi.MapGet("/", ([FromServices]ObtenerTodosExpedientesUseCase useCase) =>
