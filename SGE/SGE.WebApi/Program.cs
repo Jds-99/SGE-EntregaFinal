@@ -11,7 +11,7 @@ using SGE.WebApi.Endpoints;
 using SGE.Aplicacion.Expedientes;
 using SGE.Dominio.Usuarios;
 using Microsoft.VisualBasic;
-
+using SGE.Aplicacion.Tramites;
 Console.WriteLine("Iniciando el sistema...");
 
 var builder = WebApplication.CreateBuilder(args);
@@ -69,8 +69,36 @@ using (var scope = app.Services.CreateScope())
                               }; 
         //ef core agrega este objeto en el set de usuarios
         context.Set<Usuario>().Add((dynamic)nuevoAdmin);
-        context.SaveChanges();
+        
     }
+    // 2. VERIFICAMOS E INSERTAMOS EL OPERADOR 1
+    var op1Existente = usuarioRepository.ObtenerPorCorreo("operador1@sge.com");
+    if (op1Existente == null)
+    {
+        var nuevoOp1 = new {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), 
+            Nombre = "Operador Uno",
+            CorreoElectronico = "operador1@sge.com",
+            contraseniaHash = passwordHasher.HashPassword("123operador"),
+            EsAdministrador = false // 👈 No es admin, es operador común
+        };
+        context.Set<Usuario>().Add((dynamic)nuevoOp1);
+    }
+
+    // 3. VERIFICAMOS E INSERTAMOS EL OPERADOR 2
+    var op2Existente = usuarioRepository.ObtenerPorCorreo("operador2@sge.com");
+    if (op2Existente == null)
+    {
+        var nuevoOp2 = new {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000003"), 
+            Nombre = "Operador Dos",
+            CorreoElectronico = "operador2@sge.com",
+            contraseniaHash = passwordHasher.HashPassword("123operador"),
+            EsAdministrador = false // 👈 No es admin, es operador común
+        };
+        context.Set<Usuario>().Add((dynamic)nuevoOp2);
+    }
+    context.SaveChanges();
 }
 Console.WriteLine("¡Base de datos y tablas verificadas/creadas con éxito!");
 
@@ -92,12 +120,6 @@ if (app.Environment.IsDevelopment())
 
 // Endpoint de Prueba (Sanity Check)
 app.MapGet("/", () => "¡La API del Sistema de Gestion de Expedientes está funcionando!");
-
-// Mapeo de Endpoints de cada módulo
-app.MapLoginEndpoint();
-app.MapTramitesEndpoints();
-//app.MapExpedientesEndpoints();
-//app.MapUsuariosEndpoints();
 
 // ==========================================
 // 👥 MÓDULO DE USUARIOS 
@@ -287,10 +309,10 @@ expedientesApi.MapDelete("/{id:guid}", (Guid id, EliminarExpedienteUseCase useCa
             return Results.Ok(response);
         }).RequireAuthorization();
 // 5. GET Trámites por Expediente
-        ExpedientesApi.MapGet("/{expedienteId:guid}/tramites", (
+        expedientesApi.MapGet("/{expedienteId:guid}/tramites", (
             Guid expedienteId, 
-            ClaimsPrincipal user, 
-            [FromServices] ObtenerPorIdUseCase useCase
+            System.Security.Claims.ClaimsPrincipal user, 
+           ObtenerPorIdUseCase useCase
         ) =>
         {
             var userIdString = user.FindFirst("ID")?.Value;
@@ -308,7 +330,7 @@ var tramitesApi = app.MapGroup("/api/tramites").WithTags("Gestión de Trámites"
         // 1. POST (Arreglado)
         tramitesApi.MapPost("/", (
              AgregarTramiteRequest request, 
-            ClaimsPrincipal user, 
+            System.Security.Claims.ClaimsPrincipal user, 
              AgregarTramiteUseCase useCase
         ) =>
         {
@@ -319,7 +341,7 @@ var tramitesApi = app.MapGroup("/api/tramites").WithTags("Gestión de Trámites"
         // 2. DELETE (Arreglado)
         tramitesApi.MapDelete("/{tramiteId:guid}", (
             Guid tramiteId, 
-            ClaimsPrincipal user, 
+            System.Security.Claims.ClaimsPrincipal user, 
             EliminarTramiteUseCase useCase
         ) =>
         {
@@ -338,12 +360,12 @@ var tramitesApi = app.MapGroup("/api/tramites").WithTags("Gestión de Trámites"
         {
             var response = useCase.Ejecutar(request);
             return Results.Ok(response);
-        }).RequireAuthorization()
+        }).RequireAuthorization();
 
         // 4. GET Obtener por Id 
         tramitesApi.MapGet("/{tramiteId:guid}/Tramite", (
             Guid tramiteId, 
-            ClaimsPrincipal user, 
+            System.Security.Claims.ClaimsPrincipal user, 
              ObtenerTramitePorIdUseCase useCase
         ) =>
         {
