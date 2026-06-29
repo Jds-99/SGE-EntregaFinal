@@ -23,7 +23,7 @@ builder.Services.AddScoped<ITokenService, JwtTokenProvider>();
 // Soporte para el formato estándar de errores (RFC 7807)
 builder.Services.AddProblemDetails(); 
 
-// Registramos el manejador personalizado de excepciones globales 🌟 (¡Vuelve a estar activo!)
+// Registramos el manejador personalizado de excepciones globales  (¡Vuelve a estar activo!)
 builder.Services.AddExceptionHandler<ManejadorDeExcepcionesGlobales>(); 
 
 // Construimos las dependencias de las capas del sistema
@@ -48,7 +48,7 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// 🌟 BLOQUE DE INICIALIZACIÓN: Forzamos a EF Core a crear las tablas faltantes usando el Scope correcto
+//  BLOQUE DE INICIALIZACIÓN: Forzamos a EF Core a crear las tablas faltantes usando el Scope correcto
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<SgeContext>();
@@ -94,7 +94,7 @@ void AsignarIdFijo(Usuario u, Guid idFijo)
     var adminExistente = usuarioRepository.ObtenerPorCorreo("admin@sge.com");
     if(adminExistente == null)
     {
-        // 💡 Instanciamos el objeto REAL de tu dominio (Acomodá los parámetros según tu constructor)
+        //  Instanciamos el objeto REAL de tu dominio (Acomodá los parámetros según tu constructor)
         var nuevoAdmin = new Usuario("Admin inicial", "admin@sge.com", passwordHasher.HashPassword("admin123"), true);
         
         // Le clavamos el ID fijo de prueba
@@ -124,7 +124,7 @@ void AsignarIdFijo(Usuario u, Guid idFijo)
 }
 Console.WriteLine("¡Base de datos y tablas verificadas/creadas con éxito!");
 
-// Activamos el pipeline del manejador de errores global 🌟 (¡Vuelve a estar activo!)
+// Activamos el pipeline del manejador de errores global  (¡Vuelve a estar activo!)
 app.UseExceptionHandler();
 
 // "Descubre quién es" leyendo el token de la cabecera HTTP
@@ -257,7 +257,7 @@ usuariosApi.MapPut("/{id:guid}/permisos", (Guid id, System.Security.Claims.Claim
 
     var idAdminOperador = Guid.Parse(adminIdClaim);
 
-    // 2. Armamos el Request completo que exige tu Caso de Uso 🎯
+    // 2. Armamos el Request completo que exige tu Caso de Uso 
     var request = new ModificarPermisosRequest
     {
         UsuarioId = id,                         // Tomado del parámetro de la URL
@@ -345,7 +345,7 @@ expedientesApi.MapDelete("/{id:guid}", (Guid id,[FromServices] EliminarExpedient
             return Results.Ok(response);
         }).RequireAuthorization();
 // ==========================================
-// 📂 MÓDULO DE TRAMITES 
+// MÓDULO DE TRAMITES 
 // ==========================================
 var tramitesApi = app.MapGroup("/api/tramites").WithTags("Gestión de Trámites");
 

@@ -76,15 +76,15 @@ public class Expediente
     if (idUsuario == Guid.Empty)
         throw new DominioException("Usuario invalido");
 
-    // 🌟 Si es null o es el escrito inicial, no cambia el estado
+    //  Si es null o es el escrito inicial, no cambia el estado
     if (etiqueta == null || etiqueta == EtiquetaTramite.EscritoPresentado) 
         return false;
 
-    // 🌟 Comparamos ENUM contra ENUM de forma directa y segura
+    //  Comparamos ENUM contra ENUM de forma directa y segura
     if (etiqueta == EtiquetaTramite.PaseAEstudio)
         this.Estado = EstadoExpediente.ParaResolver;
         
-    else if (etiqueta == EtiquetaTramite.Resolucion) // 🌟 Cambié a Resolucion que es lo que manda tu Program.cs
+    else if (etiqueta == EtiquetaTramite.Resolucion) //  Cambié a Resolucion que es lo que manda tu Program.cs
         this.Estado = EstadoExpediente.ConResolucion;
         
     else if (etiqueta == EtiquetaTramite.PaseAlArchivo)
@@ -95,7 +95,7 @@ public class Expediente
     {
         this.UsuarioUltimoCambio = idUsuario;
         this.FechaUltimaModificacion = DateTime.Now;
-        return true; // 🌟 Le avisa al servicio que guarde los cambios en el archivo
+        return true; //  Le avisa al servicio que guarde los cambios en el archivo
     }
 
     return false;

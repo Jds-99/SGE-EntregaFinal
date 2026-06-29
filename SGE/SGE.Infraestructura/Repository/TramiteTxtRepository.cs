@@ -28,7 +28,7 @@ public class TramiteTxtRepository : ITramiteRepository
         {
             if (string.IsNullOrWhiteSpace(linea)) continue;
 
-            // 🌟 Separamos usando punto y coma (;)
+            //  Separamos usando punto y coma (;)
             string[] datos = linea.Split(';');
 
             Guid id = Guid.Parse(datos[0]);
