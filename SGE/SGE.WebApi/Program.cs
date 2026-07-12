@@ -7,7 +7,6 @@ using SGE.WebApi;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using SGE.WebApi.Endpoints;
 using SGE.Aplicacion.Expedientes;
 using SGE.Dominio.Usuarios;
 using Microsoft.VisualBasic;
