@@ -14,13 +14,7 @@ public class SgeContext : DbContext
     public SgeContext(DbContextOptions<SgeContext> options) : base(options)
     {
     }
-    public SgeContext()
-    {
-        // Le dice a EF Core: "Si la base de datos SGE.sqlite no existe, 
-        // creala automáticamente con todas las tablas ahora mismo"
-        this.Database.EnsureCreated();
 
-    }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)

@@ -6,7 +6,7 @@ namespace SGE.Dominio.Tramites;
 
 public record class Contenido
 {
-    public String Valor;
+    public String Valor {get; private set;}
     public Contenido(String valor)
     {
         if (string.IsNullOrWhiteSpace(valor))

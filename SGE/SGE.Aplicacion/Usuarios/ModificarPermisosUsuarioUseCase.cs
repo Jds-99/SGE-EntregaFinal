@@ -41,7 +41,7 @@ public class ModificarPermisosUsuarioUseCase
 
         usuario.ReemplazarPermisos(request.NuevosPermisos);
         _usuarioRepository.Modificar(usuario);
-        _unidadDeTrabajo?.Guardar();
+        _unidadDeTrabajo.Guardar();
         return new ModificarPermisosResponse { Exitoso = true, Mensaje = "Permisos actualizados con éxito." };
     }
 }

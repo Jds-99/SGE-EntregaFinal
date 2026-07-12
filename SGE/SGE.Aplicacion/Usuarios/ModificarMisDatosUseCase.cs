@@ -40,6 +40,6 @@ public class ModificarMisDatosUseCase
         }
 
         _repository.Modificar(usuario);
-        _unidadDeTrabajo?.Guardar();
+        _unidadDeTrabajo.Guardar();
     }
 }

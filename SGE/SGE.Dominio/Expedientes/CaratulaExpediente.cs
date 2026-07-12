@@ -5,7 +5,7 @@ namespace SGE.Dominio.Expedientes;
 
 public record class CaratulaExpendiente
 {
-    public String Valor;
+    public  String Valor {get; private set;}
     public CaratulaExpendiente(string valor)
     {
         if (string.IsNullOrWhiteSpace(valor))

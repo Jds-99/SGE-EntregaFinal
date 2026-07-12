@@ -8,7 +8,7 @@ public class Usuario
 {
     public Guid Id { get; private set; } 
     public string Nombre { get; private set; } 
-    public string CorreoElectronico { get; private set; } 
+    public Correo CorreoElectronico { get; private set; } 
     public string contraseniaHash { get; private set; } 
     public bool EsAdministrador { get; private set; } 
     
@@ -20,7 +20,7 @@ public class Usuario
     {
         Id = Guid.NewGuid();
         Nombre = string.Empty; 
-        CorreoElectronico = string.Empty; 
+        CorreoElectronico = new Correo(string.Empty); 
         contraseniaHash = string.Empty; 
     }
 
@@ -35,7 +35,7 @@ public class Usuario
 
             Id = Guid.NewGuid(); 
             Nombre = nombre; 
-            CorreoElectronico = correoElectronico.Trim().ToLower(); 
+            CorreoElectronico = new Correo(correoElectronico); 
             this.contraseniaHash = contraseniaHash; 
             EsAdministrador = esAdministrador; 
     }
@@ -87,7 +87,7 @@ public class Usuario
             throw new DominioException("El formato del correo electrónico no es válido.");
 
         Nombre = nuevoNombre;
-        CorreoElectronico = nuevoCorreo.Trim().ToLower();
+        CorreoElectronico = new Correo(nuevoCorreo);
     }
 
     public void Cambiarcontrasenia(string nuevacontraseniaHash)
