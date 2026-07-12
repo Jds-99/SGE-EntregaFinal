@@ -35,7 +35,7 @@ public class Usuario
 
             Id = Guid.NewGuid(); 
             Nombre = nombre; 
-            CorreoElectronico = new Correo(correoElectronico); 
+            this.CorreoElectronico = new Correo(correoElectronico); 
             this.contraseniaHash = contraseniaHash; 
             EsAdministrador = esAdministrador; 
     }

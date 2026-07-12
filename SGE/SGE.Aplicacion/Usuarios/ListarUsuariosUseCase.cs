@@ -30,7 +30,7 @@ public class ListarUsuariosUseCase
         return usuarios.Select(u => new UsuarioResponseDto(
             u.Id, 
             u.Nombre, 
-            u.CorreoElectronico, 
+            u.CorreoElectronico.ToString(), 
             u.EsAdministrador,
             u.Permisos
         )).ToList();

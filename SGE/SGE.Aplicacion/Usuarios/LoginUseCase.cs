@@ -41,7 +41,7 @@ public class LoginUseCase
         }
         */
         //generar el token 
-        if (usuario.contraseniaHash != request.contrasenia)
+        if (usuario!.contraseniaHash != request.contrasenia)
     {
     throw new CredencialesInvalidadException(" Credenciales incorrectas");
     }
@@ -53,7 +53,7 @@ public class LoginUseCase
         {
             Token=tokenGenerado,
             Nombre=usuario.Nombre,
-            CorreoElectronico= usuario.CorreoElectronico,
+            CorreoElectronico= usuario.CorreoElectronico.ToString(),
             EsAdministrador = usuario.EsAdministrador
         };
     }

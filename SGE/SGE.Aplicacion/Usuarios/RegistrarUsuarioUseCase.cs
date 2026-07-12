@@ -54,7 +54,7 @@ public class RegistrarUsuarioUseCase
     {
         Id = nuevoUsuario.Id,
         Nombre = nuevoUsuario.Nombre!,
-        CorreoElectronico = nuevoUsuario.CorreoElectronico!, 
+        CorreoElectronico = nuevoUsuario.CorreoElectronico.ToString(), 
         Mensaje = "Usuario registrado exitosamente."
        
     };
