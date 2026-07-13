@@ -46,7 +46,9 @@ public class SgeContext : DbContext
         
         entity.Property(u => u.Nombre).IsRequired();
 
-        entity.Property(u => u.CorreoElectronico).IsRequired().HasColumnName("Correo");
+        entity.Property(u => u.CorreoElectronico).HasConversion(correoObjeto => correoObjeto.Valor, 
+                correoString => new Correo(correoString)
+            ).HasColumnName("CorreoElectronico");
 
         entity.HasIndex(u => u.CorreoElectronico).IsUnique();
 
