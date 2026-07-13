@@ -14,12 +14,13 @@ public class ModificarMisDatosUseCase
 {
     private readonly IUsuarioRepository _repository;
     private readonly IPasswordHasher _hasher;
-    private readonly IUnidadDeTrabajo? _unidadDeTrabajo;
+    private readonly IUnidadDeTrabajo _unidadDeTrabajo;
 
-    public ModificarMisDatosUseCase(IUsuarioRepository repository, IPasswordHasher hasher)
+    public ModificarMisDatosUseCase(IUsuarioRepository repository, IPasswordHasher hasher,IUnidadDeTrabajo unidadDeTrabajo)
     {
         _repository = repository;
         _hasher = hasher;
+        _unidadDeTrabajo = unidadDeTrabajo;
     }
 
     public void Ejecutar(ModificarMisDatosRequest request)

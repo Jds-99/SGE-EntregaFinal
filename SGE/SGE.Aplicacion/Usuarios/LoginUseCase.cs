@@ -26,8 +26,8 @@ public class LoginUseCase
         }
         // buscamos el usuario en base de datos por correo electronico normalizando a minisculas como se guardo en el registro
         string correoNormalizado = request.CorreoElectronico.Trim().ToLower();
-        var usuario = _usuarioRepository.ObtenerPorCorreo(correoNormalizado);
-        /*
+        var usuario = _usuarioRepository.ObtenerPorCorreo(new Dominio.Usuarios.Correo(correoNormalizado));
+        
         // si no existe tiramos excepcion 
         if (usuario== null)
         {
@@ -39,9 +39,8 @@ public class LoginUseCase
         {
             throw new CredencialesInvalidadException(" Credenciales incorrectas" );
         }
-        */
         //generar el token 
-        if (usuario.contraseniaHash != request.contrasenia)
+        if (usuario!.contraseniaHash != request.contrasenia)
     {
     throw new CredencialesInvalidadException(" Credenciales incorrectas");
     }
@@ -53,7 +52,7 @@ public class LoginUseCase
         {
             Token=tokenGenerado,
             Nombre=usuario.Nombre,
-            CorreoElectronico= usuario.CorreoElectronico,
+            CorreoElectronico= usuario.CorreoElectronico.Valor,
             EsAdministrador = usuario.EsAdministrador
         };
     }

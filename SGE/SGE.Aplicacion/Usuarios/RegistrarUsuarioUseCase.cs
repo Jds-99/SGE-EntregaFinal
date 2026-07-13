@@ -28,8 +28,8 @@ public class RegistrarUsuarioUseCase
     }
 
     string correoNormalizado = request.CorreoElectronico.Trim().ToLower();
-
-    var usuarioExistente = _usuarioRepository.ObtenerPorCorreo(correoNormalizado);
+    
+    var usuarioExistente = _usuarioRepository.ObtenerPorCorreo(new Correo(correoNormalizado));
     if (usuarioExistente is not null)
     {
         throw new DominioException("El correo electrónico ya se encuentra registrado.");
@@ -54,10 +54,8 @@ public class RegistrarUsuarioUseCase
     {
         Id = nuevoUsuario.Id,
         Nombre = nuevoUsuario.Nombre!,
-        CorreoElectronico = nuevoUsuario.CorreoElectronico!, 
+        CorreoElectronico = nuevoUsuario.CorreoElectronico.Valor, 
         Mensaje = "Usuario registrado exitosamente."
-       
-    };
-   
+    };   
 }
 }

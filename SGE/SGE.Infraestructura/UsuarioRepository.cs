@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using SGE.Aplicacion; 
 using SGE.Dominio.Usuarios;
@@ -12,6 +14,7 @@ public class UsuarioRepository : IUsuarioRepository
     public UsuarioRepository(SgeContext context)
     {
         _context = context;
+    
     }
 
     public void Agregar(Usuario usuario)
@@ -19,13 +22,14 @@ public class UsuarioRepository : IUsuarioRepository
         _context.Usuarios.Add(usuario);
     }
 
-    public Usuario? ObtenerPorCorreo(string correoElectronico)
-{
-    var correoNormalizado = correoElectronico.Trim().ToLower();
-    
-    // Comparación directa de strings en LINQ
-    return _context.Usuarios
-        .FirstOrDefault(u => u.CorreoElectronico == correoNormalizado);
+    public Usuario? ObtenerPorCorreo(Correo correoElectronico)
+    {
+        var correoNormalizado = correoElectronico;
+
+        // Traer los usuarios a memoria y comparar el valor textual del Correo
+        return _context.Usuarios
+            .AsEnumerable()
+            .FirstOrDefault(u => u.CorreoElectronico == correoNormalizado);
     }
 
     // Si tu interfaz tiene métodos como ObtenerPorId o Listar, se verían así:

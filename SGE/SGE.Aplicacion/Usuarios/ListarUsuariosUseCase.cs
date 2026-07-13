@@ -1,5 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using SGE.Aplicacion;
 using SGE.Dominio.Usuarios;
+
+namespace SGE.Aplicacion;
 
 public record ListarUsuariosRequest(Guid OperadorId);
 
@@ -11,14 +16,16 @@ public record UsuarioResponseDto(
     IReadOnlyCollection<Permiso> Permisos
 );
 
-// Modificación en el Caso de Uso:
+public record ListarUsuariosResponse(List<UsuarioResponseDto> Usuarios);
+
 public class ListarUsuariosUseCase
 {
     private readonly IUsuarioRepository _repository;
 
     public ListarUsuariosUseCase(IUsuarioRepository repository) => _repository = repository;
 
-    public List<UsuarioResponseDto> Ejecutar(ListarUsuariosRequest request)
+    // ✅ Ahora devuelve el objeto de respuesta estructurado
+    public ListarUsuariosResponse  Ejecutar(ListarUsuariosRequest request)
     {
         var operador = _repository.ObtenerPorId(request.OperadorId);
         if (operador == null || !operador.EsAdministrador)
@@ -27,12 +34,15 @@ public class ListarUsuariosUseCase
         var usuarios = _repository.ObtenerTodos();
         
         // Mapeamos las entidades de dominio a DTOs de salida seguros
-        return usuarios.Select(u => new UsuarioResponseDto(
+        var listaDtos = usuarios.Select(u => new UsuarioResponseDto(
             u.Id, 
             u.Nombre, 
-            u.CorreoElectronico, 
+            u.CorreoElectronico.Valor, 
             u.EsAdministrador,
             u.Permisos
         )).ToList();
+
+        // ✅ Retornamos el contenedor con la lista adentro
+        return new ListarUsuariosResponse(listaDtos);
     }
 }
