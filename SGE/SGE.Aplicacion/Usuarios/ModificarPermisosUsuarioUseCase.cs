@@ -20,11 +20,12 @@ public class ModificarPermisosResponse
 public class ModificarPermisosUsuarioUseCase
 {
     private readonly IUsuarioRepository _usuarioRepository;
-    private readonly IUnidadDeTrabajo? _unidadDeTrabajo;
+    private readonly IUnidadDeTrabajo _unidadDeTrabajo;
 
-    public ModificarPermisosUsuarioUseCase(IUsuarioRepository usuarioRepository)
+    public ModificarPermisosUsuarioUseCase(IUsuarioRepository usuarioRepository, IUnidadDeTrabajo unidadDeTrabajo)
     {
         _usuarioRepository = usuarioRepository;
+        _unidadDeTrabajo = unidadDeTrabajo;
     }
 
     public ModificarPermisosResponse Ejecutar(ModificarPermisosRequest request)

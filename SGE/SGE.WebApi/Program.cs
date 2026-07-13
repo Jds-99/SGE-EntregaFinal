@@ -90,7 +90,7 @@ void AsignarIdFijo(Usuario u, Guid idFijo)
     campoId?.SetValue(u, idFijo);
 }
     //verificamos si el admin existe en bd
-    var adminExistente = usuarioRepository.ObtenerPorCorreo("admin@sge.com");
+    var adminExistente = usuarioRepository.ObtenerPorCorreo(new Correo("admin@sge.com"));
     if(adminExistente == null)
     {
         //  Instanciamos el objeto REAL de tu dominio (Acomodá los parámetros según tu constructor)
@@ -103,7 +103,7 @@ void AsignarIdFijo(Usuario u, Guid idFijo)
         
     }
     // 2. VERIFICAMOS E INSERTAMOS EL OPERADOR 1
-    var op1Existente = usuarioRepository.ObtenerPorCorreo("operador1@sge.com");
+    var op1Existente = usuarioRepository.ObtenerPorCorreo(new Correo("operador1@sge.com"));
     if (op1Existente == null)
     {
         var nuevoOp1 = new Usuario("Operador Uno", "operador1@sge.com", passwordHasher.HashPassword("123operador"), false);
@@ -112,7 +112,7 @@ void AsignarIdFijo(Usuario u, Guid idFijo)
     }
 
     // 3. VERIFICAMOS E INSERTAMOS EL OPERADOR 2
-    var op2Existente = usuarioRepository.ObtenerPorCorreo("operador2@sge.com");
+    var op2Existente = usuarioRepository.ObtenerPorCorreo(new Correo("operador2@sge.com"));
     if (op2Existente == null)
     {
         var nuevoOp2 = new Usuario("Operador Dos", "operador2@sge.com", passwordHasher.HashPassword("123operador"), false);
