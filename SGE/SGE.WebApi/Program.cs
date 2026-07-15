@@ -58,7 +58,6 @@ using (var scope = app.Services.CreateScope())
     var usuarioRepository = services.GetRequiredService<IUsuarioRepository>();
     var passwordHasher = services.GetRequiredService<IPasswordHasher>();
     // Función auxiliar local para asignarle el ID por atrás a la entidad de Dominio
-    // 📌 Función auxiliar local corregida y sin errores de compilación
 void AsignarIdFijo(Usuario u, Guid idFijo)
 {
     var tipoActual = typeof(Usuario);

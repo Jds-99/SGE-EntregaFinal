@@ -37,7 +37,7 @@ public class ListarUsuariosUseCase
         var listaDtos = usuarios.Select(u => new UsuarioResponseDto(
             u.Id, 
             u.Nombre, 
-            u.CorreoElectronico.Valor, 
+            u.CorreoElectronico.Valor?.ToString() ?? string.Empty, 
             u.EsAdministrador,
             u.Permisos
         )).ToList();

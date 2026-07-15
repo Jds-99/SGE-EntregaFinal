@@ -20,7 +20,7 @@ public class Usuario
     {
         Id = Guid.NewGuid();
         Nombre = string.Empty; 
-        CorreoElectronico = new Correo(string.Empty); 
+        CorreoElectronico = null!; 
         contraseniaHash = string.Empty; 
     }
 

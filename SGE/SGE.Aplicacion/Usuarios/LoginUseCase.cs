@@ -40,7 +40,7 @@ public class LoginUseCase
             throw new CredencialesInvalidadException(" Credenciales incorrectas" );
         }
         //generar el token 
-        if (usuario!.contraseniaHash != request.contrasenia)
+        if (usuario.contraseniaHash != _passwordHasher.HashPassword(request.contrasenia))
     {
     throw new CredencialesInvalidadException(" Credenciales incorrectas");
     }

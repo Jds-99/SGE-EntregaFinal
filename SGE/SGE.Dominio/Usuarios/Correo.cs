@@ -5,12 +5,11 @@ namespace SGE.Dominio.Usuarios;
 
 public record Correo
 {
-    public string Valor { get; init; }
+    public string? Valor { get; init; }
 
-    // Constructor para EF Core y recreación
-    private Correo() 
+  private Correo() 
     {
-        Valor = null!;
+        this.Valor = null!;
     }
 
     public Correo(string valor)
